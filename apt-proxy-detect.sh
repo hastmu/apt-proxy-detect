@@ -67,11 +67,12 @@ then
    avahi-browse -tpr ${service_name} > "${T_FILE}"
 fi
 
-for service in $(cat "${T_FILE}" | grep "^+;")
+# shellcheck disable=SC2013
+for service in $(grep "^+;" "${T_FILE}")
 do
    name="$(echo "${service}" | cut -d\; -f4 | sed 's:\\032: :g')"
    namef="$(echo "${service}" | cut -d\; -f4)"
-   proxy="http://$(cat "${T_FILE}" | grep "^=" | grep "$(echo "${namef}" | sed 's:\\:\\\\:g')" | cut -d\; -f8,9 | tr ";" ":")"
+   proxy="http://$(grep "^=" "${T_FILE}" | grep "${namef//\\/\\\\}" | cut -d\; -f8,9 | tr ";" ":")"
    debug "CHECK" "Checking found proxy (${proxy}) with testurl (${testurl})"
    if check_proxy "${proxy}" "${testurl}"
    then
