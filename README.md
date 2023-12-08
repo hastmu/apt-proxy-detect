@@ -90,3 +90,57 @@ In case of issue you can set "DEBUG_APT_PROXY_DETECT" to get all details, like e
 export DEBUG_APT_PROXY_DETECT=1
 sudo apt update
 ```
+
+looks like
+
+```
+dev@dev:~$ export DEBUG_APT_PROXY_DETECT=1
+dev@dev:~$ sudo apt update
+[      INFO]: apt-proxy-detect
+[     CACHE]: stored under: /tmp/.apt-proxy._apt
+[  TEST-URL]: URL: http://packages.microsoft.com/repos/code/dists/stable/InRelease
+[     AVAHI]: get cache entries for _apt_proxy._tcp
+[     AVAHI]: get non-cache entries for _apt_proxy._tcp
+[     CHECK]: Checking found proxy (http://192.168.0.27:3142) with testurl (http://packages.microsoft.com/repos/code/dists/stable/InRelease)
+Service[ER][apt-cacher-ng proxy on squid-deb-proxy]@http://192.168.0.27:3142 
+[     CHECK]: Checking found proxy (http://192.168.0.27:8000) with testurl (http://packages.microsoft.com/repos/code/dists/stable/InRelease)
+[     CACHE]: Store (http://192.168.0.27:8000) in cache file (/tmp/.apt-proxy._apt)
+Service[OK][Squid deb proxy on squid-deb-proxy]@http://192.168.0.27:8000 
+[     PROXY]: return http://192.168.0.27:8000
+[      INFO]: apt-proxy-detect
+[     CACHE]: stored under: /tmp/.apt-proxy._apt
+[  TEST-URL]: URL: http://download.proxmox.com/debian/pve/dists/bookworm/InRelease
+[     CHECK]: Checking cached proxy (http://192.168.0.27:8000) with testurl (http://download.proxmox.com/debian/pve/dists/bookworm/InRelease)
+[     WORKS]: give back cached proxy
+[     PROXY]: return http://192.168.0.27:8000
+[      INFO]: apt-proxy-detect
+[     CACHE]: stored under: /tmp/.apt-proxy._apt
+[  TEST-URL]: URL: http://local-repo.fritz.box/local-repo/dists/trunk/InRelease
+[     CHECK]: Checking cached proxy (http://192.168.0.27:8000) with testurl (http://local-repo.fritz.box/local-repo/dists/trunk/InRelease)
+[     WORKS]: give back cached proxy
+[     PROXY]: return http://192.168.0.27:8000
+[      INFO]: apt-proxy-detect
+[     CACHE]: stored under: /tmp/.apt-proxy._apt
+[  TEST-URL]: URL: http://security.debian.org/debian-security/dists/bookworm-security/InRelease
+[     CHECK]: Checking cached proxy (http://192.168.0.27:8000) with testurl (http://security.debian.org/debian-security/dists/bookworm-security/InRelease)
+[     WORKS]: give back cached proxy
+[     PROXY]: return http://192.168.0.27:8000
+[      INFO]: apt-proxy-detect
+[     CACHE]: stored under: /tmp/.apt-proxy._apt
+[  TEST-URL]: URL: http://deb.debian.org/debian/dists/bookworm/InRelease
+[     CHECK]: Checking cached proxy (http://192.168.0.27:8000) with testurl (http://deb.debian.org/debian/dists/bookworm/InRelease)
+[     WORKS]: give back cached proxy
+[     PROXY]: return http://192.168.0.27:8000
+Hit:1 http://local-repo.fritz.box/local-repo trunk InRelease
+Hit:2 http://deb.debian.org/debian bookworm InRelease                                     
+Hit:3 http://security.debian.org/debian-security bookworm-security InRelease              
+Hit:4 http://download.proxmox.com/debian/pve bookworm InRelease                                                    
+Hit:5 http://deb.debian.org/debian bookworm-updates InRelease                                                      
+Hit:6 http://packages.microsoft.com/repos/code stable InRelease                              
+Hit:7 https://dl.google.com/linux/chrome/deb stable InRelease         
+Reading package lists... Done                   
+Building dependency tree... Done
+Reading state information... Done
+22 packages can be upgraded. Run 'apt list --upgradable' to see them.
+
+```
