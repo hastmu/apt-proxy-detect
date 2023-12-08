@@ -82,3 +82,7 @@ The found (via avahi-browse _apt_proxy._tcp) proxies are cached under /tmp/.apt-
 in case this has the wrong owner it is ignored and a waring is issued.
 
 Thats it. Enjoy.
+
+# Debugging
+
+In case of issue you can set "DEBUG_APT_PROXY_DETECT" to get all details.
