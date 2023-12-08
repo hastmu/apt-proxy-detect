@@ -49,4 +49,31 @@ Reading state information... Done
 
 # How to install?
 
-will follow next days...
+So the quickest way is:
+```
+dev@dev:~$ curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/main/install.sh  | sudo bash
+- check dependencies...
+- download latest to: /usr/local/bin/apt-proxy-detect.sh
+- set permissions to a+rx
+- create/updating /etc/apt/apt.conf.d/30apt-proxy-detect.conf
+
+```
+
+or you just download the install.sh and run it locally.
+
+# How does it work?
+
+The apt.conf.d entry makes apt aware of the tool which is then call during "apt update",
+for some reason most of the other tools are not aware that you get the target URL as 
+parameter for this call.
+
+This URL is the proxy check URL to confirm that the found or cached proxy is working with
+this dedicated URL as some proxies may have white/black lists or just not got configured 
+right or outdated for the new stuff to be checked out.
+
+In case a proxy is not serving the URL it is drop for this dedicated URL.
+
+The found (via avahi-browse _apt_proxy._tcp) proxies are cached under /tmp/.apt-proxy.<username>
+in case this has the wrong owner it is ignored and a waring is issued.
+
+Thats it. Enjoy.

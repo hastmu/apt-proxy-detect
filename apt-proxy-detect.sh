@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# (c)opyright by hastmu@gmx.net 
+# (c)opyright by gh-hastmu@gmx.de
 # checkout https://github.com/hastmu/apt-proxy-detect
 # v1 ... pure detect
 # v2 ... cache value with check
