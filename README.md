@@ -51,6 +51,11 @@ Reading state information... Done
 
 So the quickest way is:
 ```
+curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/main/install.sh  | sudo bash
+```
+
+looks like:
+```
 dev@dev:~$ curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/main/install.sh  | sudo bash
 - check dependencies...
 - download latest to: /usr/local/bin/apt-proxy-detect.sh
