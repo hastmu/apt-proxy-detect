@@ -14,10 +14,9 @@ BINS["cut"]=0
 BINS["["]=0
 BINS["printf"]=0
 
-declare -A FOUND
 for pitem in ${PATH//:/ }
 do
-    for item in ${!BINS[@]}
+    for item in "${!BINS[@]}"
     do
         if [ -x "${pitem}/${item}" ]
         then 
@@ -27,9 +26,9 @@ do
 done
 
 #declare -p BINS
-notfound=0
+declare -i notfound=0
 echo "- check dependencies..."
-for item in ${!BINS[@]}
+for item in "${!BINS[@]}"
 do
     if [ "${BINS[${item}]}" = "0" ]
     then 
@@ -42,8 +41,8 @@ done
 TARGET="/usr/local/bin/apt-proxy-detect.sh"
 # download latest
 echo "- download latest to: ${TARGET}"
-wget -q -O "${TARGET}" https://raw.githubusercontent.com/hastmu/apt-proxy-detect/main/apt-proxy-detect.sh
-if [ $? -ne 0 ]
+
+if ! wget -q -O "${TARGET}" https://raw.githubusercontent.com/hastmu/apt-proxy-detect/main/apt-proxy-detect.sh
 then
    echo "- download failed."
    [ -x "${TARGET}" ] && rm -f "${TARGET}"
@@ -54,6 +53,7 @@ chmod a+rx "${TARGET}"
 
 # install apt conf
 NAME="apt-proxy-detect"
+# shellcheck disable=SC2027
 echo "Acquire::http::ProxyAutoDetect \""${TARGET}"\";" > /etc/apt/apt.conf.d/30${NAME}.conf
 echo "- create/updating /etc/apt/apt.conf.d/30${NAME}.conf"
 
