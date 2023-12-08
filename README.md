@@ -78,7 +78,7 @@ right or outdated for the new stuff to be checked out.
 
 In case a proxy is not serving the URL it is drop for this dedicated URL.
 
-The found (via avahi-browse _apt_proxy._tcp) proxies are cached under /tmp/.apt-proxy.<username>
+The found (via avahi-browse _apt_proxy._tcp) proxies are cached under /tmp/.apt-proxy.$username
 in case this has the wrong owner it is ignored and a waring is issued.
 
 Thats it. Enjoy.
