@@ -3,7 +3,7 @@ Auto detection of apt proxies in the LAN, caching and checking status of it.
 
 # Why this is needed?
 Spending 2023 time on this topic sound/reads quite strange but up to now
-i struggle with some problem within the solutions i found so far.
+i struggle with some problems within the solutions i found so far.
 
 Issues:
 * No reliable detect proxies via mDns. (Timeouts, not found)
@@ -33,7 +33,7 @@ or within apt context:
 dev@dev:~$ sudo apt update
 Service[OK][Squid deb proxy on squid-deb-proxy]@http://192.168.0.27:8000 
 Service[ER][apt-cacher-ng proxy on squid-deb-proxy]@http://192.168.0.27:3142 
-Hit:1 http://local-repo.fritz.box/linstones-repo trunk InRelease
+Hit:1 http://local-repo.fritz.box/repo-repo trunk InRelease
 Hit:2 http://security.debian.org/debian-security bookworm-security InRelease              
 Hit:3 http://download.proxmox.com/debian/pve bookworm InRelease                           
 Hit:4 http://packages.microsoft.com/repos/code stable InRelease                           
