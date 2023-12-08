@@ -85,4 +85,8 @@ Thats it. Enjoy.
 
 # Debugging
 
-In case of issue you can set "DEBUG_APT_PROXY_DETECT" to get all details.
+In case of issue you can set "DEBUG_APT_PROXY_DETECT" to get all details, like e.g.:
+```
+export DEBUG_APT_PROXY_DETECT=1
+sudo apt update
+```
