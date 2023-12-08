@@ -12,6 +12,7 @@ BINS["sed"]=0
 BINS["grep"]=0
 BINS["cut"]=0
 BINS["["]=0
+BINS["printf"]=0
 
 declare -A FOUND
 for pitem in ${PATH//:/ }
