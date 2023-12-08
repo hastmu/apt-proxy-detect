@@ -5,12 +5,13 @@
 # v1 ... pure detect
 # v2 ... cache value with check
 
+declare -i debug
 [ -z "${DEBUG_APT_PROXY_DETECT}" ] && debug=0 || debug=1
 
 if [ $debug -eq 0 ]
 then
    function debug() { 
-      a=1
+      :
    }
 else 
    function debug() {
@@ -20,17 +21,17 @@ fi
 debug "INFO" "apt-proxy-detect"
 
 function check_proxy() {
-   wget -e http_proxy=$1 -e https_proxy=$1 -qO - $2 >> /dev/null
+   wget -e "http_proxy=$1" -e "https_proxy=$1" -qO - "$2" >> /dev/null
    return $?
 }
 
 # check cache_file
 cache_file="/tmp/.apt-proxy.$(id -un)"
-touch ${cache_file} >> /dev/null 2>&1
+touch "${cache_file}" >> /dev/null 2>&1
 debug "CACHE" "stored under: ${cache_file}"
 
 skip_cache=0
-if [ "$(stat -c %u ${cache_file})" != "$(id -u)" ]
+if [ "$(stat -c %u "${cache_file}")" != "$(id -u)" ]
 then
    skip_cache=1
    echo "E: wrong owner of cache file ${cache_file}, remove or reown to $(id -un)" >&2
@@ -41,7 +42,7 @@ debug "TEST-URL" "URL: ${testurl}"
 
 if [ -s "${cache_file}" ] && [ ${skip_cache} -eq 0 ]
 then
-   proxy="$(cat ${cache_file})"
+   proxy="$(cat "${cache_file}")"
    debug "CHECK" "Checking cached proxy (${proxy}) with testurl (${testurl})"
    if check_proxy "${proxy}" "${testurl}"
    then
@@ -58,21 +59,21 @@ fi
 T_FILE=$(mktemp)
 trap 'rm -f ${T_FILE}' EXIT
 debug "AVAHI" "get cache entries for ${service_name}"
-avahi-browse -tcpr ${service_name} > ${T_FILE}
+avahi-browse -tcpr ${service_name} > "${T_FILE}"
 if [ ! -s "${T_FILE}" ]
 then
    # non cached
    debug "AVAHI" "get non-cache entries for ${service_name}"
-   avahi-browse -tpr ${service_name} > ${T_FILE}
+   avahi-browse -tpr ${service_name} > "${T_FILE}"
 fi
 
-for service in $(cat ${T_FILE} | grep "^+;")
+for service in $(cat "${T_FILE}" | grep "^+;")
 do
-   name="$(echo ${service} | cut -d\; -f4 | sed 's:\\032: :g')"
-   namef="$(echo ${service} | cut -d\; -f4)"
-   proxy="http://$(cat ${T_FILE} | grep "^=" | grep "$(echo ${namef} | sed 's:\\:\\\\:g')" | cut -d\; -f8,9 | tr ";" ":")"
+   name="$(echo "${service}" | cut -d\; -f4 | sed 's:\\032: :g')"
+   namef="$(echo "${service}" | cut -d\; -f4)"
+   proxy="http://$(cat "${T_FILE}" | grep "^=" | grep "$(echo "${namef}" | sed 's:\\:\\\\:g')" | cut -d\; -f8,9 | tr ";" ":")"
    debug "CHECK" "Checking found proxy (${proxy}) with testurl (${testurl})"
-   if check_proxy ${proxy} ${testurl}
+   if check_proxy "${proxy}" "${testurl}"
    then
       # ok 
       if [ -z "${ret}" ]
@@ -81,7 +82,7 @@ do
          if [ ${skip_cache} -eq 0 ] 
          then
             debug "CACHE" "Store (${proxy}) in cache file (${cache_file})"
-            echo "${proxy}" > ${cache_file}
+            echo "${proxy}" > "${cache_file}"
          fi
       fi
       stat="OK"
