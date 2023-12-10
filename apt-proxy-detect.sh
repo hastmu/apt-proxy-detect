@@ -4,6 +4,7 @@
 # checkout https://github.com/hastmu/apt-proxy-detect
 # v1 ... pure detect
 # v2 ... cache value with check
+# v3 ... add persistant caching for found proxies.
 
 declare -i debug
 [ -z "${DEBUG_APT_PROXY_DETECT}" ] && debug=0 || debug=1
@@ -25,10 +26,28 @@ function check_proxy() {
    return $?
 }
 
+# cache file name
+cache_file_name=".apt-proxy-detect.$(id -un)"
+
+# persistant cache file location
+# $HOME or special for system accounts
+declare -A CACHE_FILE_LOC
+CACHE_FILE_LOC["_apt"]="/var/lib/apt/lists/auxfiles/${cache_file_name}"
+
+if [ -n "${CACHE_FILE_LOC[$(id -un)]}" ]
+then
+   cache_file="${CACHE_FILE_LOC[$(id -un)]}"
+else
+   if [ -w "${HOME}/.config/." ]
+   then
+      cache_file="${HOME}/.config/${cache_file_name}"
+   else
+      cache_file="/tmp/${cache_file_name}"
+   fi
+fi
+
 # check cache_file
-cache_file="/tmp/.apt-proxy.$(id -un)"
 touch "${cache_file}" >> /dev/null 2>&1
-debug "CACHE" "stored under: ${cache_file}"
 
 skip_cache=0
 if [ "$(stat -c %u "${cache_file}")" != "$(id -u)" ]
@@ -42,6 +61,7 @@ debug "TEST-URL" "URL: ${testurl}"
 
 if [ -s "${cache_file}" ] && [ ${skip_cache} -eq 0 ]
 then
+   debug "CACHE" "using stored under: ${cache_file}"
    proxy="$(cat "${cache_file}")"
    debug "CHECK" "Checking cached proxy (${proxy}) with testurl (${testurl})"
    if check_proxy "${proxy}" "${testurl}"
@@ -94,4 +114,8 @@ do
 done
 
 debug "PROXY" "return ${ret}"
-echo "${ret}"
+if [ -n "${ret}" ]
+then
+   echo "${ret}"
+fi
+exit 0
