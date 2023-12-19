@@ -83,6 +83,13 @@ in case this has the wrong owner it is ignored and a waring is issued.
 
 Thats it. Enjoy.
 
+# Caching found proxies.
+Latest version include the capability to cache the found proxies persistent over reboot.
+Default locations per user in this order (in case this is not writable fall back to the next):
+- _apt: /var/lib/apt/lists/auxfiles/
+- *: $HOME/.config/
+- *: /tmp/
+
 # Debugging
 
 In case of issue you can set "DEBUG_APT_PROXY_DETECT" to get all details, like e.g.:
