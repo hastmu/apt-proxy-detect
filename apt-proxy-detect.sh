@@ -11,6 +11,8 @@
 # defaults
 service_name="_apt_proxy._tcp"
 cache_file_name=".apt-proxy-detect.$(id -un)"
+cache_file_none_retry_timeout=60 
+declare -i cache_age=0
 
 declare -A CACHED_PROXIES
 declare -i debug
@@ -23,17 +25,30 @@ then
    }
 else 
    function debug() {
-      printf "[%10s]: %s\n" "$1" "$2" >&2
+      printf "[%12s]: %s\n" "$1" "$2" >&2
    }
 fi
-debug "INFO" "apt-proxy-detect"
+debug "INFO" "===--- apt-proxy-detect ---==="
 
 function check_proxy() {
-   wget -e "http_proxy=$1" -e "https_proxy=$1" -qO - "$2" >> /dev/null
-   return $?
+   if [ "$1" == "NONE" ]
+   then
+      if [ ${cache_age} -gt ${cache_file_none_retry_timeout} ]
+      then
+         debug "CHECK-PROXY" "NONE-cached expired" 
+         return 1
+      else
+         debug "CHECK-PROXY" "NONE-cached" 
+         return 0
+      fi
+   else
+      debug "CHECK-PROXY" "Checking cached proxy (${1}) with testurl (${2})"
+      wget -e "http_proxy=$1" -e "https_proxy=$1" -qO - "$2" >> /dev/null
+      return $?
+   fi
 }
 
-
+# --- cache location ---
 # persistant cache file location
 # $HOME or special for system accounts
 declare -A CACHE_FILE_LOC
@@ -51,9 +66,10 @@ else
    fi
 fi
 
-# check cache_file
+# check cache_file if not there create it.
 [ ! -e "${cache_file}" ] && touch "${cache_file}" >> /dev/null 2>&1
 
+# check ownership of cache file and fetch age.
 skip_cache=0
 if [ "$(stat -c %u "${cache_file}")" != "$(id -u)" ]
 then
@@ -64,23 +80,26 @@ else
    debug "CACHE-AGE" "age: ${cache_age} sec"
 fi
 
+# eval testurl
 [ -z "$1" ] && testurl="http://deb.debian.org/debian" || testurl="$1"
 debug "TEST-URL" "URL:  ${testurl}"
 testurl_hash="$(echo "${testurl}" | md5sum)" ; testurl_hash="${testurl_hash%% *}"
 debug "HASH" "HASH: ${testurl_hash}"
 
-# TODO disable for DEV.
+# check out cached value
 if [ -s "${cache_file}" ] && [ ${skip_cache} -eq 0 ]
 then
-   debug "CACHE" "using stored under: ${cache_file}"
    # shellcheck disable=SC1090
    source "${cache_file}"
    if [ $? -ne 0 ]
    then
+      # something is wrong with the cache file remove it.
+      debug "CACHE" "invalid cachefile (cleanup): ${cache_file}"
       rm -f "${cache_file}"
+   else
+   debug "CACHE" "using stored under: ${cache_file}"
    fi 
    proxy="${CACHED_PROXIES[${testurl_hash}]}"
-   debug "CHECK" "Checking cached proxy (${proxy}) with testurl (${testurl})"
    if check_proxy "${proxy}" "${testurl}"
    then
       debug "WORKS" "give back cached proxy"
