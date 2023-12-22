@@ -43,7 +43,7 @@ function check_proxy() {
       fi
    else
       debug "CHECK-PROXY" "Checking cached proxy (${1}) with testurl (${2})"
-      wget -e "http_proxy=$1" -e "https_proxy=$1" -qO - "$2" >> /dev/null
+      wget -T 1 -e "http_proxy=$1" -e "https_proxy=$1" -qO - "$2" >> /dev/null
       return $?
    fi
 }
@@ -91,26 +91,27 @@ if [ -s "${cache_file}" ] && [ ${skip_cache} -eq 0 ]
 then
    # shellcheck disable=SC1090
    source "${cache_file}"
+   # shellcheck disable=SC2181
    if [ $? -ne 0 ]
    then
       # something is wrong with the cache file remove it.
       debug "CACHE" "invalid cachefile (cleanup): ${cache_file}"
       rm -f "${cache_file}"
    else
-   debug "CACHE" "using stored under: ${cache_file}"
+      debug "CACHE" "using stored under: ${cache_file}"
    fi 
    proxy="${CACHED_PROXIES[${testurl_hash}]}"
    if check_proxy "${proxy}" "${testurl}"
    then
       debug "WORKS" "give back cached proxy"
       debug "PROXY" "return ${proxy}"
-      echo "${proxy}"
+      [ "${proxy}" != "NONE" ] && echo "${proxy}"
       exit 0
    else
       debug "FAILED" "remove cache file."
-      declare -p CACHED_PROXIES >&2
+#      declare -p CACHED_PROXIES >&2
       unset CACHED_PROXIES[${testurl_hash}]
-      declare -p CACHED_PROXIES >&2
+#      declare -p CACHED_PROXIES >&2
    fi
 fi
 
@@ -149,8 +150,8 @@ done
 debug "PROXY" "return :${ret}:"
 if [ -n "${ret}" ]
 then
-   debug "CACHE" "Store (${proxy}) in cache file (${cache_file})"
-   CACHED_PROXIES[${testurl_hash}]="${proxy}"
+   debug "CACHE" "Store (${ret}) in cache file (${cache_file})"
+   CACHED_PROXIES[${testurl_hash}]="${ret}"
    echo "${ret}"
 else
    proxy="NONE"
