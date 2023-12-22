@@ -5,7 +5,14 @@
 # v1 ... pure detect
 # v2 ... cache value with check
 # v3 ... add persistant caching for found proxies.
+# v4 ... extend caching to also cache no-found proxy state 
+#        and proxy checking based on testurl
 
+# defaults
+service_name="_apt_proxy._tcp"
+cache_file_name=".apt-proxy-detect.$(id -un)"
+
+declare -A CACHED_PROXIES
 declare -i debug
 [ -z "${DEBUG_APT_PROXY_DETECT}" ] && debug=0 || debug=1
 
@@ -26,8 +33,6 @@ function check_proxy() {
    return $?
 }
 
-# cache file name
-cache_file_name=".apt-proxy-detect.$(id -un)"
 
 # persistant cache file location
 # $HOME or special for system accounts
@@ -47,22 +52,34 @@ else
 fi
 
 # check cache_file
-touch "${cache_file}" >> /dev/null 2>&1
+[ ! -e "${cache_file}" ] && touch "${cache_file}" >> /dev/null 2>&1
 
 skip_cache=0
 if [ "$(stat -c %u "${cache_file}")" != "$(id -u)" ]
 then
    skip_cache=1
    echo "E: wrong owner of cache file ${cache_file}, remove or reown to $(id -un)" >&2
+else
+   cache_age=$(( $(date +%s) - $(stat -c %Y "${cache_file}") ))
+   debug "CACHE-AGE" "age: ${cache_age} sec"
 fi
-service_name="_apt_proxy._tcp"
-[ -z "$1" ] && testurl="http://deb.debian.org/debian" || testurl="$1"
-debug "TEST-URL" "URL: ${testurl}"
 
+[ -z "$1" ] && testurl="http://deb.debian.org/debian" || testurl="$1"
+debug "TEST-URL" "URL:  ${testurl}"
+testurl_hash="$(echo "${testurl}" | md5sum)" ; testurl_hash="${testurl_hash%% *}"
+debug "HASH" "HASH: ${testurl_hash}"
+
+# TODO disable for DEV.
 if [ -s "${cache_file}" ] && [ ${skip_cache} -eq 0 ]
 then
    debug "CACHE" "using stored under: ${cache_file}"
-   proxy="$(cat "${cache_file}")"
+   # shellcheck disable=SC1090
+   source "${cache_file}"
+   if [ $? -ne 0 ]
+   then
+      rm -f "${cache_file}"
+   fi 
+   proxy="${CACHED_PROXIES[${testurl_hash}]}"
    debug "CHECK" "Checking cached proxy (${proxy}) with testurl (${testurl})"
    if check_proxy "${proxy}" "${testurl}"
    then
@@ -72,7 +89,9 @@ then
       exit 0
    else
       debug "FAILED" "remove cache file."
-      rm -f "${cache_file}"
+      declare -p CACHED_PROXIES >&2
+      unset CACHED_PROXIES[${testurl_hash}]
+      declare -p CACHED_PROXIES >&2
    fi
 fi
 
@@ -100,11 +119,6 @@ do
       if [ -z "${ret}" ]
       then
          ret="${proxy}"
-         if [ ${skip_cache} -eq 0 ] 
-         then
-            debug "CACHE" "Store (${proxy}) in cache file (${cache_file})"
-            echo "${proxy}" > "${cache_file}"
-         fi
       fi
       stat="OK"
    else
@@ -113,9 +127,23 @@ do
    printf "Service[%s][%s]@%s \n" "${stat}" "${name}" "${proxy}" >&2
 done
 
-debug "PROXY" "return ${ret}"
+debug "PROXY" "return :${ret}:"
 if [ -n "${ret}" ]
 then
+   debug "CACHE" "Store (${proxy}) in cache file (${cache_file})"
+   CACHED_PROXIES[${testurl_hash}]="${proxy}"
    echo "${ret}"
+else
+   proxy="NONE"
+   debug "CACHE" "Store (${proxy}) in cache file (${cache_file})"
+   CACHED_PROXIES[${testurl_hash}]="${proxy}"
 fi
+
+# write back cachefile finally.
+if [ ${skip_cache} -eq 0 ] 
+then
+   debug "CACHE" "Update cachefile."
+   declare -p CACHED_PROXIES > "${cache_file}"
+fi
+
 exit 0
