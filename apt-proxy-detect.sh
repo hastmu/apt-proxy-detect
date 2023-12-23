@@ -42,7 +42,7 @@ function check_proxy() {
          return 0
       fi
    else
-      debug "CHECK-PROXY" "Checking cached proxy (${1}) with testurl (${2})"
+      debug "CHECK-PROXY" "Checking proxy (${1}) with testurl (${2})"
       wget -T 1 -e "http_proxy=$1" -e "https_proxy=$1" -qO - "$2" >> /dev/null
       return $?
    fi
@@ -101,17 +101,20 @@ then
       debug "CACHE" "using stored under: ${cache_file}"
    fi 
    proxy="${CACHED_PROXIES[${testurl_hash}]}"
-   if check_proxy "${proxy}" "${testurl}"
+   if [ -n "${proxy}" ]
    then
-      debug "WORKS" "give back cached proxy"
-      debug "PROXY" "return ${proxy}"
-      [ "${proxy}" != "NONE" ] && echo "${proxy}"
-      exit 0
-   else
-      debug "FAILED" "remove cache file."
-#      declare -p CACHED_PROXIES >&2
-      unset CACHED_PROXIES[${testurl_hash}]
-#      declare -p CACHED_PROXIES >&2
+      if check_proxy "${proxy}" "${testurl}"
+      then
+         debug "WORKS" "give back cached proxy"
+         debug "PROXY" "return ${proxy}"
+         [ "${proxy}" != "NONE" ] && echo "${proxy}"
+         exit 0
+      else
+         debug "FAILED" "remove cache file."
+   #      declare -p CACHED_PROXIES >&2
+         unset CACHED_PROXIES[${testurl_hash}]
+   #      declare -p CACHED_PROXIES >&2
+      fi
    fi
 fi
 
