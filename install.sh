@@ -13,6 +13,8 @@ BINS["grep"]=0
 BINS["cut"]=0
 BINS["["]=0
 BINS["printf"]=0
+BINS["date"]=0
+BINS["md5sum"]=0
 
 for pitem in ${PATH//:/ }
 do
@@ -42,7 +44,9 @@ TARGET="/usr/local/bin/apt-proxy-detect.sh"
 # download latest
 echo "- download latest to: ${TARGET}"
 
-if ! wget -q -O "${TARGET}" https://raw.githubusercontent.com/hastmu/apt-proxy-detect/main/apt-proxy-detect.sh
+
+echo "- BRANCH [${BRANCH:=main}]"
+if ! wget -q -O "${TARGET}" https://raw.githubusercontent.com/hastmu/apt-proxy-detect/${BRANCH}/apt-proxy-detect.sh
 then
    echo "- download failed."
    [ -x "${TARGET}" ] && rm -f "${TARGET}"
