@@ -7,6 +7,11 @@
 # v3 ... add persistant caching for found proxies.
 # v4 ... extend caching to also cache no-found proxy state 
 #        and proxy checking based on testurl
+#        + debug reveals ms execution time
+#        + timeout for check_proxy
+#        + cache age per entry not per whole file.
+#        TODO: cache leading url not full, as i get called for all packages also.
+
 
 # defaults
 service_name="_apt_proxy._tcp"
@@ -15,6 +20,8 @@ cache_file_none_retry_timeout=60
 declare -i cache_age=0
 
 declare -A CACHED_PROXIES
+declare -A CACHED_PROXIES_AGE
+
 declare -i debug
 [ -z "${DEBUG_APT_PROXY_DETECT}" ] && debug=0 || debug=1
 
@@ -24,8 +31,10 @@ then
       :
    }
 else 
+   declare -i start_time=0
+   start_time=$(date +%s%N)
    function debug() {
-      printf "[%12s]: %s\n" "$1" "$2" >&2
+      printf "[%12s][%4s]: %s\n" "$1" "$(( ($(date +%s%N) - start_time) / 1000000 ))" "$2" >&2
    }
 fi
 debug "INFO" "===--- apt-proxy-detect ---==="
@@ -43,7 +52,12 @@ function check_proxy() {
       fi
    else
       debug "CHECK-PROXY" "Checking proxy (${1}) with testurl (${2})"
-      wget -T 1 -e "http_proxy=$1" -e "https_proxy=$1" -qO - "$2" >> /dev/null
+      if [ $debug -gt 1 ]
+      then
+         wget -v --tries=1 -T 1 -e "http_proxy=$1" -e "https_proxy=$1" -O - "$2" >&2
+      else
+         wget -q --tries=1 -T 1 -e "http_proxy=$1" -e "https_proxy=$1" -O - "$2" >> /dev/null 2>&1
+      fi
       return $?
    fi
 }
@@ -75,9 +89,6 @@ if [ "$(stat -c %u "${cache_file}")" != "$(id -u)" ]
 then
    skip_cache=1
    echo "E: wrong owner of cache file ${cache_file}, remove or reown to $(id -un)" >&2
-else
-   cache_age=$(( $(date +%s) - $(stat -c %Y "${cache_file}") ))
-   debug "CACHE-AGE" "age: ${cache_age} sec"
 fi
 
 # eval testurl
@@ -100,6 +111,8 @@ then
    else
       debug "CACHE" "using stored under: ${cache_file}"
    fi 
+   cache_age=$(( $(date +%s) - ${CACHED_PROXIES_AGE[${testurl_hash}]:=0} ))
+   debug "CACHE-AGE" "age: ${cache_age} sec"
    proxy="${CACHED_PROXIES[${testurl_hash}]}"
    if [ -n "${proxy}" ]
    then
@@ -110,9 +123,10 @@ then
          [ "${proxy}" != "NONE" ] && echo "${proxy}"
          exit 0
       else
-         debug "FAILED" "remove cache file."
+         debug "FAILED" "remove from cache file."
    #      declare -p CACHED_PROXIES >&2
-         unset CACHED_PROXIES[${testurl_hash}]
+         unset 'CACHED_PROXIES["${testurl_hash}"]'
+         unset 'CACHED_PROXIES_AGE["${testurl_hash}"]'
    #      declare -p CACHED_PROXIES >&2
       fi
    fi
@@ -151,22 +165,23 @@ do
 done
 
 debug "PROXY" "return :${ret}:"
+
 if [ -n "${ret}" ]
 then
-   debug "CACHE" "Store (${ret}) in cache file (${cache_file})"
-   CACHED_PROXIES[${testurl_hash}]="${ret}"
    echo "${ret}"
 else
-   proxy="NONE"
-   debug "CACHE" "Store (${proxy}) in cache file (${cache_file})"
-   CACHED_PROXIES[${testurl_hash}]="${proxy}"
+   ret="NONE"
 fi
 
 # write back cachefile finally.
 if [ ${skip_cache} -eq 0 ] 
 then
+   debug "CACHE" "Store (${ret}) in cache file (${cache_file})"
+   CACHED_PROXIES[${testurl_hash}]="${ret}"
+   CACHED_PROXIES_AGE[${testurl_hash}]="$(date +%s)"
    debug "CACHE" "Update cachefile."
    declare -p CACHED_PROXIES > "${cache_file}"
+   declare -p CACHED_PROXIES_AGE >> "${cache_file}"
 fi
 
 exit 0
