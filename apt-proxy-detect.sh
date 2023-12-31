@@ -11,6 +11,8 @@
 #        + timeout for check_proxy
 #        + cache age per entry not per whole file.
 #        + cache leading url not full, as i get called for all packages also.
+# v5 ... learn working in general and use them for new urls first
+#        + limit wget check to 10 bytes
 
 
 # defaults
@@ -19,6 +21,7 @@ cache_file_name=".apt-proxy-detect.$(id -un)"
 cache_file_none_retry_timeout=60 
 declare -i cache_age=0
 
+declare -A WORKING_PROXIES
 declare -A CACHED_PROXIES
 declare -A CACHED_PROXIES_AGE
 
@@ -51,14 +54,21 @@ function check_proxy() {
          return 0
       fi
    else
-      debug "CHECK-PROXY" "Checking proxy (${1}) with testurl (${2})"
       if [ $debug -gt 1 ]
       then
-         wget -v --tries=1 -T 1 -e "http_proxy=$1" -e "https_proxy=$1" -O - "$2" >&2
+         wget -v --tries=1 -T 1 --header="Range: bytes=0-10" -e "http_proxy=$1" -e "https_proxy=$1" -O - "$2" >&2
       else
-         wget -q --tries=1 -T 1 -e "http_proxy=$1" -e "https_proxy=$1" -O - "$2" >> /dev/null 2>&1
+         wget -q --tries=1 -T 1 --header="Range: bytes=0-10" -e "http_proxy=$1" -e "https_proxy=$1" -O - "$2" >> /dev/null 2>&1
       fi
-      return $?
+      local stat=$?
+      if [ $stat -eq 0 ]
+      then
+         debug "CHECK-PROXY" "Proxy (${1}) works with testurl (${2})."
+
+      else
+         debug "CHECK-PROXY" "Proxy (${1}) failed with testurl (${2})"
+      fi
+      return ${stat}
    fi
 }
 
@@ -134,38 +144,53 @@ then
    fi
 fi
 
-T_FILE=$(mktemp)
-trap 'rm -f ${T_FILE}' EXIT
-debug "AVAHI" "get cache entries for ${service_name}"
-avahi-browse -tcpr ${service_name} > "${T_FILE}"
-if [ ! -s "${T_FILE}" ]
-then
-   # non cached
-   debug "AVAHI" "get non-cache entries for ${service_name}"
-   avahi-browse -tpr ${service_name} > "${T_FILE}"
-fi
-
-# shellcheck disable=SC2013
-for service in $(grep "^+;" "${T_FILE}")
+# check if there is a proxy of the past which works
+for proxy in "${!WORKING_PROXIES[@]}"
 do
-   name="$(echo "${service}" | cut -d\; -f4 | sed 's:\\032: :g')"
-   namef="$(echo "${service}" | cut -d\; -f4)"
-   proxy="http://$(grep "^=" "${T_FILE}" | grep "${namef//\\/\\\\}" | cut -d\; -f8,9 | tr ";" ":")"
-   debug "CHECK" "Checking found proxy (${proxy}) with testurl (${testurl})"
+   debug "CHECK" "once working proxy: ${proxy} for ${testurl}"
    if check_proxy "${proxy}" "${testurl}"
    then
-      # ok 
-      if [ -z "${ret}" ]
-      then
-         ret="${proxy}"
-      fi
-      stat="OK"
-   else
-      stat="ER"
+      ret="${proxy}"
    fi
-   printf "Service[%s][%s]@%s \n" "${stat}" "${name}" "${proxy}" >&2
 done
 
+# search for proxies if none was found so far.
+if [ -z "${ret}" ]
+then
+   T_FILE=$(mktemp)
+   trap 'rm -f ${T_FILE}' EXIT
+   debug "AVAHI" "get cache entries for ${service_name}"
+   avahi-browse -tcpr ${service_name} > "${T_FILE}"
+   if [ ! -s "${T_FILE}" ]
+   then
+      # non cached
+      debug "AVAHI" "get non-cache entries for ${service_name}"
+      avahi-browse -tpr ${service_name} > "${T_FILE}"
+   fi
+
+   # shellcheck disable=SC2013
+   for service in $(grep "^+;" "${T_FILE}")
+   do
+      name="$(echo "${service}" | cut -d\; -f4 | sed 's:\\032: :g')"
+      namef="$(echo "${service}" | cut -d\; -f4)"
+      proxy="http://$(grep "^=" "${T_FILE}" | grep "${namef//\\/\\\\}" | cut -d\; -f8,9 | tr ";" ":")"
+      debug "CHECK" "Checking found proxy (${proxy}) with testurl (${testurl})"
+      if check_proxy "${proxy}" "${testurl}"
+      then
+         # ok 
+         if [ -z "${ret}" ]
+         then
+            ret="${proxy}"
+         fi
+         stat="OK"
+         debug "ADD" "add proxy to working proxy list."
+         WORKING_PROXIES["${proxy}"]="${now}"
+      else
+         stat="ER"
+      fi
+      printf "Service[%s][%s]@%s \n" "${stat}" "${name}" "${proxy}" >&2
+   done
+fi
 debug "PROXY" "return :${ret}:"
 
 if [ -n "${ret}" ]
@@ -184,6 +209,7 @@ then
    debug "CACHE" "Update cachefile."
    declare -p CACHED_PROXIES > "${cache_file}"
    declare -p CACHED_PROXIES_AGE >> "${cache_file}"
+   declare -p WORKING_PROXIES >> "${cache_file}"
 fi
 
 exit 0
