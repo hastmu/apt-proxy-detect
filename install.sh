@@ -46,7 +46,7 @@ echo "- download latest to: ${TARGET}"
 
 
 echo "- BRANCH [${BRANCH:=main}]"
-if ! wget -q -O "${TARGET}" https://raw.githubusercontent.com/hastmu/apt-proxy-detect/${BRANCH}/apt-proxy-detect.sh
+if ! wget -q -O "${TARGET}" "https://raw.githubusercontent.com/hastmu/apt-proxy-detect/${BRANCH}/apt-proxy-detect.sh"
 then
    echo "- download failed."
    [ -x "${TARGET}" ] && rm -f "${TARGET}"
