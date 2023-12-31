@@ -88,6 +88,8 @@ this dedicated URL as some proxies may have white/black lists or just not got co
 right or outdated for the new stuff to be checked out.
 
 In case a proxy is not serving the URL it is drop for this dedicated URL.
+Latest version also cache the none-proxy state for 60 seconds, accepting the fact
+that there is currently no proxy around which can serve the request.
 
 The found (via avahi-browse _apt_proxy._tcp) proxies are cached in case this has the 
 wrong owner it is ignored and a waring is issued.
@@ -109,52 +111,122 @@ export DEBUG_APT_PROXY_DETECT=1
 sudo apt update
 ```
 
-looks like
+looks like (first run)
 
 ```
 dev@dev:~$ export DEBUG_APT_PROXY_DETECT=1
 dev@dev:~$ sudo apt update
 # INFO-TAG       MS : MESSAGE
-[        INFO][   2]: ===--- apt-proxy-detect ---===
+[        INFO][   1]: ===--- apt-proxy-detect ---===
 [    TEST-URL][  16]: URL:  http://packages.microsoft.com/repos/code/dists/stable/InRelease
-[        HASH][  25]: HASH: c0b917f192fa7cccb3f536f2c01b824d of (http://packages.microsoft.com)
-[       CACHE][  30]: using stored under: /var/lib/apt/lists/auxfiles/.apt-proxy-detect._apt
-[   CACHE-AGE][  33]: age: 687 sec
-[ CHECK-PROXY][  35]: Checking proxy (http://192.168.0.27:8000) with testurl (http://packages.microsoft.com/repos/code/dists/stable/InRelease)
-[       WORKS][ 127]: give back cached proxy
-[       PROXY][ 131]: return http://192.168.0.27:8000
-[        INFO][   3]: ===--- apt-proxy-detect ---===
-[    TEST-URL][  20]: URL:  http://download.proxmox.com/debian/pve/dists/bookworm/InRelease
-[        HASH][  34]: HASH: 17b43db99b56eb6355d41861f4f304d0 of (http://download.proxmox.com)
-[       CACHE][  41]: using stored under: /var/lib/apt/lists/auxfiles/.apt-proxy-detect._apt
-[   CACHE-AGE][  44]: age: 687 sec
-[ CHECK-PROXY][  47]: Checking proxy (http://192.168.0.27:8000) with testurl (http://download.proxmox.com/debian/pve/dists/bookworm/InRelease)
-[       WORKS][ 461]: give back cached proxy
-[       PROXY][ 464]: return http://192.168.0.27:8000
-[        INFO][   3]: ===--- apt-proxy-detect ---===
-[    TEST-URL][  17]: URL:  http://local-repo.fritz.box/local-repo/dists/trunk/InRelease
-[        HASH][  25]: HASH: 2bfbb1335aaf9d333a5c9498226eb208 of (http://local-repo.fritz.box)
-[       CACHE][  32]: using stored under: /var/lib/apt/lists/auxfiles/.apt-proxy-detect._apt
-[   CACHE-AGE][  37]: age: 687 sec
-[ CHECK-PROXY][  39]: Checking proxy (http://192.168.0.27:8000) with testurl (http://local-repo.fritz.box/local-repo/dists/trunk/InRelease)
-[       WORKS][  57]: give back cached proxy
-[       PROXY][  60]: return http://192.168.0.27:8000
+[        HASH][  26]: HASH: c0b917f192fa7cccb3f536f2c01b824d of (http://packages.microsoft.com)
+[       AVAHI][  33]: get cache entries for _apt_proxy._tcp
+[       CHECK][ 208]: Checking found proxy (http://192.168.0.27:8000) with testurl (http://packages.microsoft.com/repos/code/dists/stable/InRelease)
+[ CHECK-PROXY][ 331]: Proxy (http://192.168.0.27:8000) works with testurl (http://packages.microsoft.com/repos/code/dists/stable/InRelease).
+[         ADD][ 333]: add proxy to working proxy list.
+Service[OK][Squid deb proxy on squid-deb-proxy]@http://192.168.0.27:8000 
+[       CHECK][ 356]: Checking found proxy (http://192.168.0.27:3142) with testurl (http://packages.microsoft.com/repos/code/dists/stable/InRelease)
+[ CHECK-PROXY][ 367]: Proxy (http://192.168.0.27:3142) failed with testurl (http://packages.microsoft.com/repos/code/dists/stable/InRelease)
+Service[ER][apt-cacher-ng proxy on squid-deb-proxy]@http://192.168.0.27:3142 
+[       PROXY][ 370]: return :http://192.168.0.27:8000:
+[       CACHE][ 373]: Store (http://192.168.0.27:8000) in cache file (/var/lib/apt/lists/auxfiles/.apt-proxy-detect._apt)
+[       CACHE][ 375]: Update cachefile.
+[        INFO][   2]: ===--- apt-proxy-detect ---===
+[    TEST-URL][  17]: URL:  http://download.proxmox.com/debian/pve/dists/bookworm/InRelease
+[        HASH][  29]: HASH: 17b43db99b56eb6355d41861f4f304d0 of (http://download.proxmox.com)
+[       CACHE][  35]: using stored under: /var/lib/apt/lists/auxfiles/.apt-proxy-detect._apt
+[       CHECK][  38]: once working proxy: http://192.168.0.27:8000 for http://download.proxmox.com/debian/pve/dists/bookworm/InRelease
+[ CHECK-PROXY][ 141]: Proxy (http://192.168.0.27:8000) works with testurl (http://download.proxmox.com/debian/pve/dists/bookworm/InRelease).
+[       PROXY][ 144]: return :http://192.168.0.27:8000:
+[       CACHE][ 146]: Store (http://192.168.0.27:8000) in cache file (/var/lib/apt/lists/auxfiles/.apt-proxy-detect._apt)
+[       CACHE][ 148]: Update cachefile.
+[        INFO][   1]: ===--- apt-proxy-detect ---===
+[    TEST-URL][  15]: URL:  http://local-repo.fritz.box/local-repo/dists/trunk/InRelease
+[        HASH][  23]: HASH: 2bfbb1335aaf9d333a5c9498226eb208 of (http://local-repo.fritz.box)
+[       CACHE][  28]: using stored under: /var/lib/apt/lists/auxfiles/.apt-proxy-detect._apt
+[       CHECK][  30]: once working proxy: http://192.168.0.27:8000 for http://local-repo.fritz.box/local-repo/dists/trunk/InRelease
+[ CHECK-PROXY][  49]: Proxy (http://192.168.0.27:8000) works with testurl (http://local-repo.fritz.box/local-repo/dists/trunk/InRelease).
+[       PROXY][  51]: return :http://192.168.0.27:8000:
+[       CACHE][  53]: Store (http://192.168.0.27:8000) in cache file (/var/lib/apt/lists/auxfiles/.apt-proxy-detect._apt)
+[       CACHE][  56]: Update cachefile.
+[        INFO][   1]: ===--- apt-proxy-detect ---===
+[    TEST-URL][  27]: URL:  http://security.debian.org/debian-security/dists/bookworm-security/InRelease
+[        HASH][  38]: HASH: 3b68f7b6590a2da8625ff71f01d38ffb of (http://security.debian.org)
+[       CACHE][  47]: using stored under: /var/lib/apt/lists/auxfiles/.apt-proxy-detect._apt
+[       CHECK][  51]: once working proxy: http://192.168.0.27:8000 for http://security.debian.org/debian-security/dists/bookworm-security/InRelease
+[ CHECK-PROXY][ 102]: Proxy (http://192.168.0.27:8000) works with testurl (http://security.debian.org/debian-security/dists/bookworm-security/InRelease).
+[       PROXY][ 104]: return :http://192.168.0.27:8000:
+[       CACHE][ 106]: Store (http://192.168.0.27:8000) in cache file (/var/lib/apt/lists/auxfiles/.apt-proxy-detect._apt)
+[       CACHE][ 108]: Update cachefile.
+[        INFO][   1]: ===--- apt-proxy-detect ---===
+[    TEST-URL][  16]: URL:  http://deb.debian.org/debian/dists/bookworm/InRelease
+[        HASH][  24]: HASH: efbfa0e2acaaa513c457b6698de83118 of (http://deb.debian.org)
+[       CACHE][  28]: using stored under: /var/lib/apt/lists/auxfiles/.apt-proxy-detect._apt
+[       CHECK][  30]: once working proxy: http://192.168.0.27:8000 for http://deb.debian.org/debian/dists/bookworm/InRelease
+[ CHECK-PROXY][  93]: Proxy (http://192.168.0.27:8000) works with testurl (http://deb.debian.org/debian/dists/bookworm/InRelease).
+[       PROXY][  95]: return :http://192.168.0.27:8000:
+[       CACHE][  97]: Store (http://192.168.0.27:8000) in cache file (/var/lib/apt/lists/auxfiles/.apt-proxy-detect._apt)
+[       CACHE][ 100]: Update cachefile.
+Hit:1 http://local-repo.fritz.box/local-repo trunk InRelease
+Hit:2 http://deb.debian.org/debian bookworm InRelease                                     
+Hit:3 http://security.debian.org/debian-security bookworm-security InRelease              
+Hit:4 http://download.proxmox.com/debian/pve bookworm InRelease                                                    
+Hit:5 http://deb.debian.org/debian bookworm-updates InRelease                                                      
+Hit:6 http://packages.microsoft.com/repos/code stable InRelease                              
+Hit:7 https://dl.google.com/linux/chrome/deb stable InRelease         
+Reading package lists... Done                   
+Building dependency tree... Done
+Reading state information... Done
+22 packages can be upgraded. Run 'apt list --upgradable' to see them.
+
+```
+
+looks like (second run)
+
+```
+dev@dev:~$ export DEBUG_APT_PROXY_DETECT=1
+dev@dev:~$ sudo apt update
+# INFO-TAG       MS : MESSAGE
+[        INFO][   1]: ===--- apt-proxy-detect ---===
+[    TEST-URL][  15]: URL:  http://packages.microsoft.com/repos/code/dists/stable/InRelease
+[        HASH][  23]: HASH: c0b917f192fa7cccb3f536f2c01b824d of (http://packages.microsoft.com)
+[       CACHE][  28]: using stored under: /var/lib/apt/lists/auxfiles/.apt-proxy-detect._apt
+[   CACHE-AGE][  30]: age: 110 sec
+[ CHECK-PROXY][ 138]: Proxy (http://192.168.0.27:8000) works with testurl (http://packages.microsoft.com/repos/code/dists/stable/InRelease).
+[       WORKS][ 140]: give back cached proxy
+[       PROXY][ 142]: return http://192.168.0.27:8000
+[        INFO][   1]: ===--- apt-proxy-detect ---===
+[    TEST-URL][  16]: URL:  http://download.proxmox.com/debian/pve/dists/bookworm/InRelease
+[        HASH][  23]: HASH: 17b43db99b56eb6355d41861f4f304d0 of (http://download.proxmox.com)
+[       CACHE][  28]: using stored under: /var/lib/apt/lists/auxfiles/.apt-proxy-detect._apt
+[   CACHE-AGE][  30]: age: 110 sec
+[ CHECK-PROXY][ 134]: Proxy (http://192.168.0.27:8000) works with testurl (http://download.proxmox.com/debian/pve/dists/bookworm/InRelease).
+[       WORKS][ 136]: give back cached proxy
+[       PROXY][ 138]: return http://192.168.0.27:8000
+[        INFO][   2]: ===--- apt-proxy-detect ---===
+[    TEST-URL][  16]: URL:  http://local-repo.fritz.box/local-repo/dists/trunk/InRelease
+[        HASH][  24]: HASH: 2bfbb1335aaf9d333a5c9498226eb208 of (http://local-repo.fritz.box)
+[       CACHE][  28]: using stored under: /var/lib/apt/lists/auxfiles/.apt-proxy-detect._apt
+[   CACHE-AGE][  30]: age: 111 sec
+[ CHECK-PROXY][  49]: Proxy (http://192.168.0.27:8000) works with testurl (http://local-repo.fritz.box/local-repo/dists/trunk/InRelease).
+[       WORKS][  52]: give back cached proxy
+[       PROXY][  54]: return http://192.168.0.27:8000
 [        INFO][   2]: ===--- apt-proxy-detect ---===
 [    TEST-URL][  19]: URL:  http://security.debian.org/debian-security/dists/bookworm-security/InRelease
-[        HASH][  28]: HASH: 3b68f7b6590a2da8625ff71f01d38ffb of (http://security.debian.org)
-[       CACHE][  36]: using stored under: /var/lib/apt/lists/auxfiles/.apt-proxy-detect._apt
-[   CACHE-AGE][  39]: age: 688 sec
-[ CHECK-PROXY][  41]: Checking proxy (http://192.168.0.27:8000) with testurl (http://security.debian.org/debian-security/dists/bookworm-security/InRelease)
-[       WORKS][  93]: give back cached proxy
-[       PROXY][  95]: return http://192.168.0.27:8000
+[        HASH][  27]: HASH: 3b68f7b6590a2da8625ff71f01d38ffb of (http://security.debian.org)
+[       CACHE][  32]: using stored under: /var/lib/apt/lists/auxfiles/.apt-proxy-detect._apt
+[   CACHE-AGE][  34]: age: 110 sec
+[ CHECK-PROXY][  44]: Proxy (http://192.168.0.27:8000) works with testurl (http://security.debian.org/debian-security/dists/bookworm-security/InRelease).
+[       WORKS][  48]: give back cached proxy
+[       PROXY][  50]: return http://192.168.0.27:8000
 [        INFO][   2]: ===--- apt-proxy-detect ---===
-[    TEST-URL][  24]: URL:  http://deb.debian.org/debian/dists/bookworm/InRelease
-[        HASH][  33]: HASH: efbfa0e2acaaa513c457b6698de83118 of (http://deb.debian.org)
-[       CACHE][  41]: using stored under: /var/lib/apt/lists/auxfiles/.apt-proxy-detect._apt
-[   CACHE-AGE][  44]: age: 687 sec
-[ CHECK-PROXY][  47]: Checking proxy (http://192.168.0.27:8000) with testurl (http://deb.debian.org/debian/dists/bookworm/InRelease)
-[       WORKS][ 145]: give back cached proxy
-[       PROXY][ 147]: return http://192.168.0.27:8000
+[    TEST-URL][  18]: URL:  http://deb.debian.org/debian/dists/bookworm/InRelease
+[        HASH][  30]: HASH: efbfa0e2acaaa513c457b6698de83118 of (http://deb.debian.org)
+[       CACHE][  34]: using stored under: /var/lib/apt/lists/auxfiles/.apt-proxy-detect._apt
+[   CACHE-AGE][  37]: age: 110 sec
+[ CHECK-PROXY][ 107]: Proxy (http://192.168.0.27:8000) works with testurl (http://deb.debian.org/debian/dists/bookworm/InRelease).
+[       WORKS][ 110]: give back cached proxy
+[       PROXY][ 112]: return http://192.168.0.27:8000
 Hit:1 http://local-repo.fritz.box/local-repo trunk InRelease
 Hit:2 http://deb.debian.org/debian bookworm InRelease                                     
 Hit:3 http://security.debian.org/debian-security bookworm-security InRelease              
