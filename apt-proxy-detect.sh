@@ -123,11 +123,12 @@ then
    else
       debug "CACHE" "using stored under: ${cache_file}"
    fi 
+
    cache_age=$(( now - ${CACHED_PROXIES_AGE[${testurl_hash}]:=0} ))
-   debug "CACHE-AGE" "age: ${cache_age} sec"
    proxy="${CACHED_PROXIES[${testurl_hash}]}"
    if [ -n "${proxy}" ]
    then
+      debug "CACHE-AGE" "age: ${cache_age} sec"
       if check_proxy "${proxy}" "${testurl}"
       then
          debug "WORKS" "give back cached proxy"
