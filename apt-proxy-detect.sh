@@ -13,20 +13,83 @@
 #        + cache leading url not full, as i get called for all packages also.
 # v5 ... learn working in general and use them for new urls first
 #        + limit wget check to 10 bytes
+# v6 ... add default proxies
 
 
 # defaults
+defaults_location="/usr/local/etc/apt-proxy-detect.bash"
 service_name="_apt_proxy._tcp"
 cache_file_name=".apt-proxy-detect.$(id -un)"
 cache_file_none_retry_timeout=60 
-declare -i cache_age=0
 
+# help
+if [ -z "$1" ]
+then
+   echo ""
+   echo "usage: $0 <defaults|set-default|url for proxy>"
+   echo ""
+   echo " defaults                        ... list default proxies"
+   echo " set-default <proxy1>,<proxy2>   ... set default proxies"
+   echo " url for proxy                   ... this is the url a proxy is tested for"
+   echo ""
+   exit 1
+fi
+
+# service function
+if [ "$1" = "set-default" ]
+then
+   declare -A WORKING_PROXIES
+   echo "defining default proxies..."
+   now=$(date +%s)
+   for proxy in ${2//,/ }
+   do
+      echo "proxy: ${proxy}"
+      WORKING_PROXIES["${proxy}"]=${now}
+   done
+   if [ -w "${defaults_location%/*}" ]
+   then
+      echo "saved."
+      declare -p WORKING_PROXIES > "${defaults_location}"
+   else
+      echo "can not save under: ${defaults_location}"
+   fi
+   exit 0
+fi
+
+if [ "$1" = "defaults" ]
+then
+   declare -A WORKING_PROXIES
+   if [ -r "${defaults_location}" ]
+   then
+      # shellcheck disable=SC1090
+      if source "${defaults_location}"
+      then
+         for proxy in "${!WORKING_PROXIES[@]}"
+         do
+            echo "proxy: ${proxy}"
+         done
+      else
+         echo "error reading default, please delete ${defaults_location}"
+         exit 1
+      fi
+   else
+      echo "no defaults found."
+   fi
+   exit 0
+fi
+
+# runtime
+declare -i cache_age=0
 declare -A WORKING_PROXIES
 declare -A CACHED_PROXIES
 declare -A CACHED_PROXIES_AGE
 
 declare -i debug
 [ -z "${DEBUG_APT_PROXY_DETECT}" ] && debug=0 || debug=1
+
+function error() {
+   printf "[%12s][%4s]: ERROR: %s\n" "$1" "$(( ($(date +%s%N) - start_time) / 1000000 ))" "$2" >&2
+}
 
 if [ $debug -eq 0 ]
 then
@@ -41,6 +104,18 @@ else
    }
 fi
 debug "INFO" "===--- apt-proxy-detect ---==="
+# source defaults
+if [ -r "${defaults_location}" ]
+then
+   # shellcheck disable=SC1090
+   if source "${defaults_location}"
+   then
+      debug "DEFAULTS" "loaded from ${defaults_location}"
+   else
+      error "DEFAULTS" "failed from ${defaults_location} please fix it."
+      exit 1
+   fi
+fi
 
 function check_proxy() {
    if [ "$1" == "NONE" ]
