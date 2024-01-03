@@ -16,12 +16,14 @@ BINS["printf"]=0
 BINS["date"]=0
 BINS["md5sum"]=0
 
+SUGGESTED_DEBS="coreutils grep sed wget avahi-utils"
+
 for pitem in ${PATH//:/ }
 do
     for item in "${!BINS[@]}"
     do
         if [ -x "${pitem}/${item}" ]
-        then 
+        then
             BINS[${item}]="${pitem}/${item}"
         fi        
     done
@@ -38,7 +40,13 @@ do
         notfound=1
     fi        
 done
-[ ${notfound} -eq 1 ] && exit 1
+
+if [ ${notfound} -eq 1 ]
+then
+   echo "Some items are missing, you may find them with:"
+   echo "sudo apt install -y ${SUGGESTED_DEBS}"
+   exit 1
+fi
 
 TARGET="/usr/local/bin/apt-proxy-detect.sh"
 # download latest
