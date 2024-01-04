@@ -51,7 +51,7 @@ proxy: https://192.168.0.3:4544
 proxy: http://192.168.0.27:8000
 ```
 
-or with specific checking (failing):
+or with specific url for checking (failing+avahi detection):
 ```
 dev@dev:~$ apt-proxy-detect.sh github.xyz
 Service[ER][apt-cacher-ng proxy on squid-deb-proxy]@http://192.168.0.27:3142 
@@ -135,7 +135,7 @@ Default locations per user in this order (in case this is not writable fall back
 
 # Debugging
 
-In case of issue you can set "DEBUG_APT_PROXY_DETECT" to get all details, like e.g.:
+In case of issues you can set "DEBUG_APT_PROXY_DETECT" to get all details, like e.g.:
 ```
 export DEBUG_APT_PROXY_DETECT=1
 sudo apt update
@@ -150,16 +150,20 @@ dev@dev:~$ sudo apt update
 [        INFO][   2]: ===--- apt-proxy-detect ---===
 [    TEST-URL][  18]: URL:  http://packages.microsoft.com/repos/code/dists/stable/InRelease
 [        HASH][  42]: HASH: c0b917f192fa7cccb3f536f2c01b824d of (http://packages.microsoft.com)
+
 # no proxy known so search one...
 [       AVAHI][  52]: get cache entries for _apt_proxy._tcp
 [       CHECK][ 110]: Checking found proxy (http://192.168.0.27:8000) with testurl (http://packages.microsoft.com/repos/code/dists/stable/InRelease)
 [ CHECK-PROXY][ 150]: Proxy (http://192.168.0.27:8000) works with testurl (http://packages.microsoft.com/repos/code/dists/stable/InRelease).
+
 # register working proxy
 [         ADD][ 161]: add proxy to working proxy list.
+
 # first proxy does work for url
 Service[OK][Squid deb proxy on squid-deb-proxy]@http://192.168.0.27:8000 
 [       CHECK][ 209]: Checking found proxy (http://192.168.0.27:3142) with testurl (http://packages.microsoft.com/repos/code/dists/stable/InRelease)
 [ CHECK-PROXY][ 220]: Proxy (http://192.168.0.27:3142) failed with testurl (http://packages.microsoft.com/repos/code/dists/stable/InRelease)
+
 # second proxy does not work for the url
 Service[ER][apt-cacher-ng proxy on squid-deb-proxy]@http://192.168.0.27:3142 
 [       PROXY][ 223]: return :http://192.168.0.27:8000:
@@ -169,9 +173,11 @@ Service[ER][apt-cacher-ng proxy on squid-deb-proxy]@http://192.168.0.27:3142
 [    TEST-URL][  18]: URL:  http://download.proxmox.com/debian/pve/dists/bookworm/InRelease
 [        HASH][  34]: HASH: 17b43db99b56eb6355d41861f4f304d0 of (http://download.proxmox.com)
 [       CACHE][  39]: using stored under: /var/lib/apt/lists/auxfiles/.apt-proxy-detect._apt
+
 # check if the once working proxy if fine
 [       CHECK][  44]: once working proxy: http://192.168.0.27:8000 for http://download.proxmox.com/debian/pve/dists/bookworm/InRelease
 [ CHECK-PROXY][  70]: Proxy (http://192.168.0.27:8000) works with testurl (http://download.proxmox.com/debian/pve/dists/bookworm/InRelease).
+
 # it is so no need to search again.
 [       PROXY][  72]: return :http://192.168.0.27:8000:
 [       CACHE][  75]: Store (http://192.168.0.27:8000) in cache file (/var/lib/apt/lists/auxfiles/.apt-proxy-detect._apt)
@@ -181,8 +187,10 @@ Service[ER][apt-cacher-ng proxy on squid-deb-proxy]@http://192.168.0.27:3142
 [        HASH][  24]: HASH: 2bfbb1335aaf9d333a5c9498226eb208 of (http://local-repo.fritz.box)
 [       CACHE][  29]: using stored under: /var/lib/apt/lists/auxfiles/.apt-proxy-detect._apt
 [       CHECK][  31]: once working proxy: http://192.168.0.27:8000 for http://local-repo.fritz.box/local-repo/dists/trunk/InRelease
+
 # once working proxy failed
 [ CHECK-PROXY][  41]: Proxy (http://192.168.0.27:8000) failed with testurl (http://local-repo.fritz.box/local-repo/dists/trunk/InRelease)
+
 # search again
 [       AVAHI][  46]: get cache entries for _apt_proxy._tcp
 [       CHECK][  91]: Checking found proxy (http://192.168.0.27:8000) with testurl (http://local-repo.fritz.box/local-repo/dists/trunk/InRelease)
@@ -191,6 +199,7 @@ Service[ER][Squid deb proxy on squid-deb-proxy]@http://192.168.0.27:8000
 [       CHECK][ 124]: Checking found proxy (http://192.168.0.27:3142) with testurl (http://local-repo.fritz.box/local-repo/dists/trunk/InRelease)
 [ CHECK-PROXY][ 134]: Proxy (http://192.168.0.27:3142) failed with testurl (http://local-repo.fritz.box/local-repo/dists/trunk/InRelease)
 Service[ER][apt-cacher-ng proxy on squid-deb-proxy]@http://192.168.0.27:3142 
+
 # none found (as local repos are not allowed on the proxies)
 [       PROXY][ 149]: return ::
 [       CACHE][ 152]: Store (NONE) in cache file (/var/lib/apt/lists/auxfiles/.apt-proxy-detect._apt)
@@ -273,6 +282,28 @@ dev@dev:~$ sudo apt update
 [ CHECK-PROXY][  99]: Proxy (http://192.168.0.27:8000) works with testurl (http://deb.debian.org/debian/dists/bookworm/InRelease).
 [       WORKS][ 102]: give back cached proxy
 [       PROXY][ 104]: return http://192.168.0.27:8000
+
+Hit:1 http://local-repo.fritz.box/local-repo trunk InRelease
+Hit:2 http://deb.debian.org/debian bookworm InRelease                                     
+Hit:3 http://security.debian.org/debian-security bookworm-security InRelease              
+Hit:4 http://download.proxmox.com/debian/pve bookworm InRelease                                                    
+Hit:5 http://deb.debian.org/debian bookworm-updates InRelease                                                      
+Hit:6 http://packages.microsoft.com/repos/code stable InRelease                              
+Hit:7 https://dl.google.com/linux/chrome/deb stable InRelease         
+Reading package lists... Done                   
+Building dependency tree... Done
+Reading state information... Done
+22 packages can be upgraded. Run 'apt list --upgradable' to see them.
+
+```
+
+looks like (with default proxies run)
+
+```
+dev@dev:~$ export DEBUG_APT_PROXY_DETECT=1
+dev@dev:~$ sudo apt update
+# INFO-TAG       MS : MESSAGE
+
 
 Hit:1 http://local-repo.fritz.box/local-repo trunk InRelease
 Hit:2 http://deb.debian.org/debian bookworm InRelease                                     
