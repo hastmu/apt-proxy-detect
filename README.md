@@ -12,7 +12,9 @@ Issues:
 * No longer active maintained (deprecated warnings all over the place)
 
 What do you get?
-- [X] detect via avahi
+- [X] Proxy detection via
+    - avahi
+    - set defaults
 - [X] caching of URL specific working proxy (or none if none works)
 - [X] caching over reboot if possible
 - [X] allow mixture of allowed and non allowed urls (no need for direct declaration)
@@ -22,9 +24,31 @@ What do you get?
 Example output:
 ```
 dev@dev:~$ apt-proxy-detect.sh 
-Service[ER][apt-cacher-ng proxy on squid-deb-proxy]@http://192.168.0.27:3142 
-Service[OK][Squid deb proxy on squid-deb-proxy]@http://192.168.0.27:8000 
-http://192.168.0.27:8000
+
+usage: apt-proxy-detect.sh <defaults|set-default|url for proxy>
+
+ defaults                        ... list default proxies
+ set-default <proxy1>,<proxy2>   ... set default proxies
+ url for proxy                   ... this is the url a proxy is tested for
+
+```
+
+or with setting default proxies:
+```
+dev@dev:~$ apt-proxy-detect.sh set-default https://192.168.0.2:8093,https://192.168.0.3:4544,http://192.168.0.27:8000
+defining default proxies...
+proxy: https://192.168.0.2:8093
+proxy: https://192.168.0.3:4544
+proxy: http://192.168.0.27:8000
+saved.
+```
+
+or show default proxies:
+```
+dev@dev:~$ apt-proxy-detect.sh defaults
+proxy: https://192.168.0.2:8093
+proxy: https://192.168.0.3:4544
+proxy: http://192.168.0.27:8000
 ```
 
 or with specific checking (failing):
@@ -54,6 +78,11 @@ Reading state information... Done
 ```
 
 # How to install?
+
+Required packages can be installed via:
+```
+sudo apt install -y coreutils grep sed wget avahi-utils
+```
 
 So the quickest way is:
 ```
