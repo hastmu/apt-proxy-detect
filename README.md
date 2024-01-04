@@ -303,7 +303,93 @@ looks like (with default proxies run)
 dev@dev:~$ export DEBUG_APT_PROXY_DETECT=1
 dev@dev:~$ sudo apt update
 # INFO-TAG       MS : MESSAGE
+[        INFO][   2]: ===--- apt-proxy-detect ---===
+[    DEFAULTS][   5]: loaded from /usr/local/etc/apt-proxy-detect.bash
+[    TEST-URL][  23]: URL:  http://packages.microsoft.com/repos/code/dists/stable/InRelease
+[        HASH][  42]: HASH: c0b917f192fa7cccb3f536f2c01b824d of (http://packages.microsoft.com)
 
+# first time - but introducing default proxies as once working
+[       CHECK][  48]: once working proxy: https://192.168.0.2:8093 for http://packages.microsoft.com/repos/code/dists/stable/InRelease
+[ CHECK-PROXY][  60]: Proxy (https://192.168.0.2:8093) failed with testurl (http://packages.microsoft.com/repos/code/dists/stable/InRelease)
+[       CHECK][  66]: once working proxy: https://192.168.0.3:4544 for http://packages.microsoft.com/repos/code/dists/stable/InRelease
+[ CHECK-PROXY][  80]: Proxy (https://192.168.0.3:4544) failed with testurl (http://packages.microsoft.com/repos/code/dists/stable/InRelease)
+[       CHECK][  83]: once working proxy: http://192.168.0.27:8000 for http://packages.microsoft.com/repos/code/dists/stable/InRelease
+[ CHECK-PROXY][ 124]: Proxy (http://192.168.0.27:8000) works with testurl (http://packages.microsoft.com/repos/code/dists/stable/InRelease).
+
+# and one works.
+[       PROXY][ 126]: return :http://192.168.0.27:8000:
+[       CACHE][ 129]: Store (http://192.168.0.27:8000) in cache file (/var/lib/apt/lists/auxfiles/.apt-proxy-detect._apt)
+[       CACHE][ 137]: Update cachefile.
+[        INFO][   3]: ===--- apt-proxy-detect ---===
+[    DEFAULTS][   6]: loaded from /usr/local/etc/apt-proxy-detect.bash
+[    TEST-URL][  22]: URL:  http://download.proxmox.com/debian/pve/dists/bookworm/InRelease
+[        HASH][  33]: HASH: 17b43db99b56eb6355d41861f4f304d0 of (http://download.proxmox.com)
+[       CACHE][  39]: using stored under: /var/lib/apt/lists/auxfiles/.apt-proxy-detect._apt
+[       CHECK][  43]: once working proxy: https://192.168.0.2:8093 for http://download.proxmox.com/debian/pve/dists/bookworm/InRelease
+[ CHECK-PROXY][  54]: Proxy (https://192.168.0.2:8093) failed with testurl (http://download.proxmox.com/debian/pve/dists/bookworm/InRelease)
+[       CHECK][  57]: once working proxy: https://192.168.0.3:4544 for http://download.proxmox.com/debian/pve/dists/bookworm/InRelease
+[ CHECK-PROXY][  69]: Proxy (https://192.168.0.3:4544) failed with testurl (http://download.proxmox.com/debian/pve/dists/bookworm/InRelease)
+[       CHECK][  73]: once working proxy: http://192.168.0.27:8000 for http://download.proxmox.com/debian/pve/dists/bookworm/InRelease
+[ CHECK-PROXY][ 104]: Proxy (http://192.168.0.27:8000) works with testurl (http://download.proxmox.com/debian/pve/dists/bookworm/InRelease).
+[       PROXY][ 107]: return :http://192.168.0.27:8000:
+[       CACHE][ 111]: Store (http://192.168.0.27:8000) in cache file (/var/lib/apt/lists/auxfiles/.apt-proxy-detect._apt)
+[       CACHE][ 114]: Update cachefile.
+[        INFO][   2]: ===--- apt-proxy-detect ---===
+[    DEFAULTS][   5]: loaded from /usr/local/etc/apt-proxy-detect.bash
+[    TEST-URL][  29]: URL:  http://local-repo.fritz.box/local-repo/dists/trunk/InRelease
+[        HASH][  78]: HASH: 2bfbb1335aaf9d333a5c9498226eb208 of (http://local-repo.fritz.box)
+[       CACHE][  85]: using stored under: /var/lib/apt/lists/auxfiles/.apt-proxy-detect._apt
+
+# first time - but introducing default proxies as once working
+[       CHECK][  89]: once working proxy: https://192.168.0.2:8093 for http://local-repo.fritz.box/local-repo/dists/trunk/InRelease
+[ CHECK-PROXY][ 101]: Proxy (https://192.168.0.2:8093) failed with testurl (http://local-repo.fritz.box/local-repo/dists/trunk/InRelease)
+[       CHECK][ 105]: once working proxy: https://192.168.0.3:4544 for http://local-repo.fritz.box/local-repo/dists/trunk/InRelease
+[ CHECK-PROXY][ 116]: Proxy (https://192.168.0.3:4544) failed with testurl (http://local-repo.fritz.box/local-repo/dists/trunk/InRelease)
+[       CHECK][ 119]: once working proxy: http://192.168.0.27:8000 for http://local-repo.fritz.box/local-repo/dists/trunk/InRelease
+[ CHECK-PROXY][ 141]: Proxy (http://192.168.0.27:8000) failed with testurl (http://local-repo.fritz.box/local-repo/dists/trunk/InRelease)
+
+# non is working as this is a local repo
+# search via AVAHI.
+[       AVAHI][ 147]: get cache entries for _apt_proxy._tcp
+[       CHECK][ 195]: Checking found proxy (http://192.168.0.27:8000) with testurl (http://local-repo.fritz.box/local-repo/dists/trunk/InRelease)
+[ CHECK-PROXY][ 207]: Proxy (http://192.168.0.27:8000) failed with testurl (http://local-repo.fritz.box/local-repo/dists/trunk/InRelease)
+Service[ER][Squid deb proxy on squid-deb-proxy]@http://192.168.0.27:8000 
+[       CHECK][ 237]: Checking found proxy (http://192.168.0.27:3142) with testurl (http://local-repo.fritz.box/local-repo/dists/trunk/InRelease)
+[ CHECK-PROXY][ 249]: Proxy (http://192.168.0.27:3142) failed with testurl (http://local-repo.fritz.box/local-repo/dists/trunk/InRelease)
+Service[ER][apt-cacher-ng proxy on squid-deb-proxy]@http://192.168.0.27:3142 
+
+# also the AVAHI found ones do not work -> so none (direct connect)
+[       PROXY][ 252]: return ::
+[       CACHE][ 259]: Store (NONE) in cache file (/var/lib/apt/lists/auxfiles/.apt-proxy-detect._apt)
+[       CACHE][ 262]: Update cachefile.
+[        INFO][   2]: ===--- apt-proxy-detect ---===
+[    DEFAULTS][   6]: loaded from /usr/local/etc/apt-proxy-detect.bash
+[    TEST-URL][  22]: URL:  http://security.debian.org/debian-security/dists/bookworm-security/InRelease
+[        HASH][  32]: HASH: 3b68f7b6590a2da8625ff71f01d38ffb of (http://security.debian.org)
+[       CACHE][  37]: using stored under: /var/lib/apt/lists/auxfiles/.apt-proxy-detect._apt
+[       CHECK][  40]: once working proxy: https://192.168.0.2:8093 for http://security.debian.org/debian-security/dists/bookworm-security/InRelease
+[ CHECK-PROXY][  50]: Proxy (https://192.168.0.2:8093) failed with testurl (http://security.debian.org/debian-security/dists/bookworm-security/InRelease)
+[       CHECK][  53]: once working proxy: https://192.168.0.3:4544 for http://security.debian.org/debian-security/dists/bookworm-security/InRelease
+[ CHECK-PROXY][  65]: Proxy (https://192.168.0.3:4544) failed with testurl (http://security.debian.org/debian-security/dists/bookworm-security/InRelease)
+[       CHECK][  68]: once working proxy: http://192.168.0.27:8000 for http://security.debian.org/debian-security/dists/bookworm-security/InRelease
+[ CHECK-PROXY][  96]: Proxy (http://192.168.0.27:8000) works with testurl (http://security.debian.org/debian-security/dists/bookworm-security/InRelease).
+[       PROXY][  99]: return :http://192.168.0.27:8000:
+[       CACHE][ 102]: Store (http://192.168.0.27:8000) in cache file (/var/lib/apt/lists/auxfiles/.apt-proxy-detect._apt)
+[       CACHE][ 105]: Update cachefile.
+[        INFO][   2]: ===--- apt-proxy-detect ---===
+[    DEFAULTS][   4]: loaded from /usr/local/etc/apt-proxy-detect.bash
+[    TEST-URL][  21]: URL:  http://deb.debian.org/debian/dists/bookworm/InRelease
+[        HASH][  31]: HASH: efbfa0e2acaaa513c457b6698de83118 of (http://deb.debian.org)
+[       CACHE][  37]: using stored under: /var/lib/apt/lists/auxfiles/.apt-proxy-detect._apt
+[       CHECK][  39]: once working proxy: https://192.168.0.2:8093 for http://deb.debian.org/debian/dists/bookworm/InRelease
+[ CHECK-PROXY][  50]: Proxy (https://192.168.0.2:8093) failed with testurl (http://deb.debian.org/debian/dists/bookworm/InRelease)
+[       CHECK][  52]: once working proxy: https://192.168.0.3:4544 for http://deb.debian.org/debian/dists/bookworm/InRelease
+[ CHECK-PROXY][  63]: Proxy (https://192.168.0.3:4544) failed with testurl (http://deb.debian.org/debian/dists/bookworm/InRelease)
+[       CHECK][  66]: once working proxy: http://192.168.0.27:8000 for http://deb.debian.org/debian/dists/bookworm/InRelease
+[ CHECK-PROXY][  94]: Proxy (http://192.168.0.27:8000) works with testurl (http://deb.debian.org/debian/dists/bookworm/InRelease).
+[       PROXY][  97]: return :http://192.168.0.27:8000:
+[       CACHE][ 101]: Store (http://192.168.0.27:8000) in cache file (/var/lib/apt/lists/auxfiles/.apt-proxy-detect._apt)
+[       CACHE][ 105]: Update cachefile.
 
 Hit:1 http://local-repo.fritz.box/local-repo trunk InRelease
 Hit:2 http://deb.debian.org/debian bookworm InRelease                                     
