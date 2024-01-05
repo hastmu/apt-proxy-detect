@@ -2,7 +2,7 @@
 Auto detection of apt proxies in the LAN, caching and checking status of it.
 
 In one sentence, set or let it find your proxies from work, school or from at home,
-it does not matter, it take the working ones or none (direct connect), where ever you are.
+it does not matter, it takes the working ones or none (direct connect), where ever you are.
 
 # Why this is needed?
 Spending 2023 time on this topic sound/reads quite strange but up to now
