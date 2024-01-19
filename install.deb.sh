@@ -9,9 +9,8 @@ TARGET="/usr/local/bin/${NAME}.sh"
 APT_CONFIG_NAME="/etc/apt/apt.conf.d/30${NAME}.conf"
 
 # workdir
-T_DEB="$(mktemp)"
 T_DIR=$(mktemp -d)
-trap 'rm -Rf "${T_DIR}" "${T_DEB}"' EXIT
+trap 'rm -Rf "${T_DIR}"' EXIT
 
 # create debian structure
 # TODO get metric information out of github.
@@ -49,6 +48,9 @@ EOF
 
 )
 
-T_DEB="$(mktemp)"
-dpkg -b "${T_DIR}" ${NAME}_${VERSION}_${HEADHASH}.deb
+if dpkg -b "${T_DIR}" "${NAME}_${VERSION}_${HEADHASH}.deb"
+then
+   apt-get install -y "$(pwd)/${NAME}_${VERSION}_${HEADHASH}.deb"
+   dpkg -l "${NAME}"
+fi
 
