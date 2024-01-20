@@ -1,3 +1,13 @@
+- [apt-proxy-detect](#apt-proxy-detect)
+- [Why this is needed?](#why-this-is-needed)
+- [How does it look?](#how-does-it-look)
+- [How to install?](#how-to-install)
+  - [Via deb-build and deb installation.](#via-deb-build-and-deb-installation)
+  - [Old way](#old-way)
+- [How does it work?](#how-does-it-work)
+- [Caching found proxies.](#caching-found-proxies)
+- [Debugging](#debugging)
+
 # apt-proxy-detect
 Auto detection of apt proxies in the LAN, caching and checking status of it.
 
