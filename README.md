@@ -14,6 +14,8 @@ Auto detection of apt proxies in the LAN, caching and checking status of it.
 In one sentence, set or let it find your proxies from work, school or from at home,
 it does not matter, it takes the working ones or none (direct connect), where ever you are.
 
+apt-proxy-detect can be used as on clients to detect apt-cacher-ng or squid-deb-proxy in your network.
+
 # Why this is needed?
 Spending 2023 time on this topic sound/reads quite strange but up to now
 i struggle with some problems within the solutions i found so far.
