@@ -51,6 +51,7 @@ EOF
 if dpkg -b "${T_DIR}" "${NAME}_${VERSION}_${HEADHASH}.deb"
 then
    apt-get install -y "$(pwd)/${NAME}_${VERSION}_${HEADHASH}.deb"
+   rm -fv "$(pwd)/${NAME}_${VERSION}_${HEADHASH}.deb"
    dpkg -l "${NAME}"
 fi
 
