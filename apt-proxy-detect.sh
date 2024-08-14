@@ -14,6 +14,9 @@
 # v5 ... learn working in general and use them for new urls first
 #        + limit wget check to 10 bytes
 # v6 ... add default proxies
+# v7 ... check ownership of files with test -O
+#        + updated some debug statements
+
 
 
 # defaults
@@ -34,6 +37,19 @@ then
    echo ""
    exit 1
 fi
+
+# general functions
+function check.file() {
+   # check if owner and readable
+   if [ -e "${1}" ]
+   then
+      if [ -O "${1}" ] && [ -r "${1}" ]
+      then
+         return 0
+      fi
+   fi
+   return 1
+}
 
 # service function
 if [ "$1" = "set-default" ]
@@ -59,7 +75,7 @@ fi
 if [ "$1" = "defaults" ]
 then
    declare -A WORKING_PROXIES
-   if [ -r "${defaults_location}" ]
+   if check.file "${defaults_location}"
    then
       # shellcheck disable=SC1090
       if source "${defaults_location}"
@@ -69,11 +85,11 @@ then
             echo "proxy: ${proxy}"
          done
       else
-         echo "error reading default, please delete ${defaults_location}"
+         echo "error reading default, please delete or fix ${defaults_location}"
          exit 1
       fi
    else
-      echo "no defaults found."
+      echo "no defaults found. (or wrong owner)"
    fi
    exit 0
 fi
@@ -105,7 +121,7 @@ else
 fi
 debug "INFO" "===--- apt-proxy-detect ---==="
 # source defaults
-if [ -r "${defaults_location}" ]
+if check.file "${defaults_location}"
 then
    # shellcheck disable=SC1090
    if source "${defaults_location}"
@@ -170,10 +186,13 @@ fi
 
 # check ownership of cache file and fetch age.
 skip_cache=0
-if [ "$(stat -c %u "${cache_file}")" != "$(id -u)" ]
+debug "CACHE" "using stored under: ${cache_file}"
+if ! check.file "${cache_file}"
 then
    skip_cache=1
    echo "E: wrong owner of cache file ${cache_file}, remove or reown to $(id -un)" >&2
+else
+   debug "CACHE" "- cache file available and owned right."
 fi
 
 # eval testurl
@@ -195,8 +214,6 @@ then
       # something is wrong with the cache file remove it.
       debug "CACHE" "invalid cachefile (cleanup): ${cache_file}"
       rm -f "${cache_file}"
-   else
-      debug "CACHE" "using stored under: ${cache_file}"
    fi 
 
    cache_age=$(( now - ${CACHED_PROXIES_AGE[${testurl_hash}]:=0} ))
@@ -206,12 +223,12 @@ then
       debug "CACHE-AGE" "age: ${cache_age} sec"
       if check_proxy "${proxy}" "${testurl}"
       then
-         debug "WORKS" "give back cached proxy"
+         debug "PROXY-IS-OK" "give back cached proxy"
          debug "PROXY" "return ${proxy}"
          [ "${proxy}" != "NONE" ] && echo "${proxy}"
          exit 0
       else
-         debug "FAILED" "remove from cache file."
+         debug "FAILED-PROXY" "remove from cache file."
    #      declare -p CACHED_PROXIES >&2
          unset 'CACHED_PROXIES["${testurl_hash}"]'
          unset 'CACHED_PROXIES_AGE["${testurl_hash}"]'
@@ -259,7 +276,7 @@ then
             ret="${proxy}"
          fi
          stat="OK"
-         debug "ADD" "add proxy to working proxy list."
+         debug "PROXY-IS-OK" "add proxy to working proxy list."
          WORKING_PROXIES["${proxy}"]="${now}"
       else
          stat="ER"
