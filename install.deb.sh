@@ -32,7 +32,7 @@ EOF
     # main program
     mkdir -p "${T_DIR}$(dirname "${TARGET}")"
     echo -n "- downloading ... "
-    if ! wget -q -O "${T_DIR}${TARGET}" "https://raw.githubusercontent.com/hastmu/apt-proxy-detect/${BRANCH}/apt-proxy-detect.sh"
+    if ! wget -q -O "${T_DIR}${TARGET}" "https://raw.githubusercontent.com/hastmu/apt-proxy-detect/refs/heads/${BRANCH}/apt-proxy-detect.sh"
     then
         echo "failed."
         exit 1
