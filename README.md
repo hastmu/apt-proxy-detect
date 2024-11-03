@@ -120,7 +120,7 @@ second run (cached)
 dev@dev:~$ sudo apt update
 [   VIA-PROXY][   -]: PROXY[http://192.168.0.68:8000] URL[https://packages.microsoft.com]
 [   VIA-PROXY][   -]: PROXY[http://192.168.0.68:8000] URL[http://download.proxmox.com]
-[      DIRECT][   -]: URL[http://linstones-repo.fritz.box]
+[      DIRECT][   -]: URL[http://local-repo.fritz.box]
 [   VIA-PROXY][   -]: PROXY[http://192.168.0.68:8000] URL[https://dl.google.com]
 [   VIA-PROXY][   -]: PROXY[http://192.168.0.68:8000] URL[http://security.debian.org]
 [   VIA-PROXY][   -]: PROXY[http://192.168.0.68:8000] URL[http://deb.debian.org]
