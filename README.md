@@ -12,7 +12,7 @@
 - [Debugging](#debugging)
 <hr>
 
-# apt-proxy-detect
+# apt-proxy-detect 
 Auto detection of apt proxies in the LAN, caching and checking status of it.
 
 In one sentence, set or let it find your proxies from work, school or from at home,
