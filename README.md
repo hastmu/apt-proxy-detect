@@ -31,13 +31,14 @@ Issues:
 * No longer active maintained (deprecated warnings all over the place)
 
 What do you get?
-- [X] Proxy detection via
-    - avahi
-    - set defaults
-- [X] caching of URL specific working proxy (or none if none works)
-- [X] caching over reboot if possible
-- [X] allow mixture of allowed and non allowed urls (no need for direct declaration)
-- [X] with release of branch v2.0.0:
+- [X] branch v1.0.0 (released)
+  - [X] Proxy detection via
+      - avahi
+      - set defaults
+  - [X] caching of URL specific working proxy (or none if none works)
+  - [X] caching over reboot if possible
+  - [X] allow mixture of allowed and non allowed urls (no need for direct declaration)
+- [X] branch v2.0.0 (WIP):
   - [X] Feedback on current connection config (working proxy, blocked urls, direct connects)
 
 # How does it look?
