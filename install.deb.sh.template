@@ -19,7 +19,7 @@ trap 'rm -Rf "${T_DIR}"' EXIT
     mkdir DEBIAN
     cat <<EOF > DEBIAN/control
 Package: ${NAME}
-Version: ${VERSION}-${HEADHASH}
+Version: ${VERSION}-${BRANCH//\//-}-${HEADHASH}
 Section: base 
 Priority: optional 
 Architecture: all 
@@ -27,7 +27,6 @@ Depends: coreutils, grep, sed, wget, avahi-utils
 Conflict: squid-deb-proxy-client
 Maintainer: nomail@nomail.no
 Description: apt proxy detection 
-  Branch - ${BRANCH}
 EOF
 
     # main program
@@ -49,11 +48,12 @@ EOF
 
 )
 
-if dpkg -b "${T_DIR}" "${NAME}_${HEADHASH}.deb"
+DPKG_NAME="${NAME}_${VERSION}_${BRANCH//\//-}_${HEADHASH}.deb"
+if dpkg -b "${T_DIR}" "${DPKG_NAME}"
 then
-   apt-cache show "$(pwd)/${NAME}_${HEADHASH}.deb"
-   apt-get install -y "$(pwd)/${NAME}_${HEADHASH}.deb"
-   rm -fv "$(pwd)/${NAME}_${HEADHASH}.deb"
+   apt-cache show "$(pwd)/${DPKG_NAME}"
+   apt-get install --allow-downgrades -y "$(pwd)/${DPKG_NAME}"
+   rm -fv "$(pwd)/${DPKG_NAME}"
    dpkg -l "${NAME}"
 fi
 
