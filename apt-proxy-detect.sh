@@ -281,7 +281,7 @@ then
       else
          stat="ER"
       fi
-      printf "Service[%s][%s]@%s \n" "${stat}" "${name}" "${proxy}" >&2
+      printf "Service[%s][%s@%s] URL[%s] \n" "${stat}" "${name}" "${proxy}" "${testurl_hash_url}" >&2
    done
 fi
 debug "PROXY" "return :${ret}:"
