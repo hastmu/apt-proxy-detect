@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# defaults 
+# defaults with branch
 echo "- BRANCH [${BRANCH:=@branch@}]"
 NAME="apt-proxy-detect"
 VERSION="1.0.0"

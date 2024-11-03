@@ -21,7 +21,7 @@ it does not matter, it takes the working ones or none (direct connect), where ev
 apt-proxy-detect can be used as on clients to detect apt-cacher-ng or squid-deb-proxy in your network.
 
 # Why this is needed?
-Spending 2023 time on this topic sound/reads quite strange but up to now
+Spending 2023/2024 time on this topic sound/reads quite strange but up to now
 i struggle with some problems within the solutions i found so far.
 
 Issues:
