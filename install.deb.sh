@@ -19,7 +19,7 @@ trap 'rm -Rf "${T_DIR}"' EXIT
     mkdir DEBIAN
     cat <<EOF > DEBIAN/control
 Package: ${NAME}
-Version: ${VERSION}-${BRANCH}-${HEADHASH}
+Version: ${VERSION}-${BRANCH//\//-}-${HEADHASH}
 Section: base 
 Priority: optional 
 Architecture: all 
