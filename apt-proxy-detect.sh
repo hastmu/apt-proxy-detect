@@ -99,13 +99,21 @@ declare -i cache_age=0
 declare -A WORKING_PROXIES
 declare -A CACHED_PROXIES
 declare -A CACHED_PROXIES_AGE
+declare -A AVAHI_PROXIES
 
 declare -i debug
 [ -z "${DEBUG_APT_PROXY_DETECT}" ] && debug=0 || debug=1
 
+declare -i start_time=0
+start_time=$(date +%s%N)
+
 function error() {
    printf "[%12s][%4s]: ERROR: %s\n" "$1" "$(( ($(date +%s%N) - start_time) / 1000000 ))" "$2" >&2
 }
+function info() {
+   printf "[%12s][%4s]: %s\n" "$1" "-" "$2" >&2
+}
+
 
 if [ $debug -eq 0 ]
 then
@@ -113,8 +121,6 @@ then
       :
    }
 else 
-   declare -i start_time=0
-   start_time=$(date +%s%N)
    function debug() {
       printf "[%12s][%4s]: %s\n" "$1" "$(( ($(date +%s%N) - start_time) / 1000000 ))" "$2" >&2
    }
@@ -133,6 +139,8 @@ then
    fi
 fi
 
+declare -A check_proxy_cache
+
 function check_proxy() {
    if [ "$1" == "NONE" ]
    then
@@ -141,9 +149,18 @@ function check_proxy() {
          debug "CHECK-PROXY" "NONE-cached expired" 
          return 1
       else
-         debug "CHECK-PROXY" "NONE-cached" 
+         debug "CHECK-PROXY" "NONE-cached"
+         if [ -z "${testurl_hash_url}" ]
+         then
+            info "DIRECT" "URL[$2]"
+         else
+            info "DIRECT" "URL[${testurl_hash_url}]"
+         fi
          return 0
       fi
+   elif [ ! -z "${check_proxy_cache[$1.$2]}" ]
+   then
+      return ${check_proxy_cache[$1.$2]}
    else
       if [ $debug -gt 1 ]
       then
@@ -155,10 +172,23 @@ function check_proxy() {
       if [ $stat -eq 0 ]
       then
          debug "CHECK-PROXY" "Proxy (${1}) works with testurl (${2})."
-
+         if [ -z "${testurl_hash_url}" ]
+         then
+            info "VIA-PROXY" "PROXY[$1] URL[$2]"
+         else
+            info "VIA-PROXY" "PROXY[$1] URL[${testurl_hash_url}]"
+         fi
       else
          debug "CHECK-PROXY" "Proxy (${1}) failed with testurl (${2})"
+         if [ -z "${testurl_hash_url}" ]
+         then
+            info "BLOCKED" "PROXY[$1] URL[$2]"
+         else
+            info "BLOCKED" "PROXY[$1] URL[${testurl_hash_url}]"
+         fi
+         
       fi
+      check_proxy_cache[$1.$2]=${stat}
       return ${stat}
    fi
 }
@@ -247,6 +277,16 @@ do
    fi
 done
 
+# check found AVAHI_PROXIES
+for proxy in "${!AVAHI_PROXIES[@]}"
+do
+   debug "CHECK" "avahi proxy: ${proxy} for ${testurl}"
+   if check_proxy "${proxy}" "${testurl}"
+   then
+      ret="${proxy}"
+   fi
+done
+
 # search for proxies if none was found so far.
 if [ -z "${ret}" ]
 then
@@ -268,6 +308,11 @@ then
       namef="$(echo "${service}" | cut -d\; -f4)"
       proxy="http://$(grep "^=" "${T_FILE}" | grep "${namef//\\/\\\\}" | cut -d\; -f8,9 | tr ";" ":")"
       debug "CHECK" "Checking found proxy (${proxy}) with testurl (${testurl})"
+      if [ -z "${AVAHI_PROXIES["${proxy}"]}" ]
+      then
+         # show only new once
+         info "AVAHI" "Announced proxy found PROXY[${name}@${proxy}]"
+      fi
       if check_proxy "${proxy}" "${testurl}"
       then
          # ok 
@@ -275,13 +320,14 @@ then
          then
             ret="${proxy}"
          fi
-         stat="OK"
          debug "PROXY-IS-OK" "add proxy to working proxy list."
          WORKING_PROXIES["${proxy}"]="${now}"
+         AVAHI_PROXIES["${proxy}"]="${now}"
+         break
       else
-         stat="ER"
+         debug "PROXY-IS-BAD" "add proxy to avahi proxy list."
+         AVAHI_PROXIES["${proxy}"]="${now}"
       fi
-      printf "Service[%s][%s]@%s \n" "${stat}" "${name}" "${proxy}" >&2
    done
 fi
 debug "PROXY" "return :${ret}:"
@@ -291,6 +337,7 @@ then
    echo "${ret}"
 else
    ret="NONE"
+   info "DIRECT" "URL[${testurl_hash_url}]"
 fi
 
 # write back cachefile finally.
@@ -303,6 +350,7 @@ then
    declare -p CACHED_PROXIES > "${cache_file}"
    declare -p CACHED_PROXIES_AGE >> "${cache_file}"
    declare -p WORKING_PROXIES >> "${cache_file}"
+   declare -p AVAHI_PROXIES >> "${cache_file}"
 fi
 
 exit 0
