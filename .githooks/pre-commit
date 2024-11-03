@@ -1,0 +1,36 @@
+#!/bin/bash
+
+set -e 
+
+
+   echo "" > .pre-commit.state
+   echo "" > .pre-commit.state.log
+
+   BRANCH=$(git rev-parse --abbrev-ref HEAD)
+   declare -A CHANGED=()
+
+   for item in "$(git diff --name-only --cached)"
+   do
+      echo "item: ${item}" >&2
+      found=0
+      if [[ ${item} =~ \.md$ ]] || [ "${item}" == "install.deb.sh" ]
+      then
+         echo "CHANGED: ${item}" >&2
+         CHANGED["${item}"]="${item}.$(uuidgen)"
+         cp -a "${item}" "${CHANGED["${item}"]}"
+         cp -a "${item}" "${item}.template"
+         git add "${item}.template"
+         # change file as needed
+         sed -i "s:@branch@:${BRANCH}:g" "${item}"
+         diff "${item}" "${CHANGED["${item}"]}" >> .pre-commit.state.log || true
+         git status >> .pre-commit.state.log || true
+         git add "${item}" || true
+         git status >> .pre-commit.state.log || true
+      fi
+   done
+
+   declare -p CHANGED >> .pre-commit.state
+
+#   git branch
+#   pwd
+#   env | grep -i git
