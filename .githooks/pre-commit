@@ -9,7 +9,7 @@ set -e
    BRANCH=$(git rev-parse --abbrev-ref HEAD)
    declare -A CHANGED=()
 
-   for item in "$(git diff --name-only --cached)"
+   for item in $(git diff --name-only --cached)
    do
       echo "item: ${item}" >> .pre-commit.state.log
       found=0
