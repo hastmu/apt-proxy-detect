@@ -37,6 +37,8 @@ What do you get?
 - [X] caching of URL specific working proxy (or none if none works)
 - [X] caching over reboot if possible
 - [X] allow mixture of allowed and non allowed urls (no need for direct declaration)
+- [X] with release of branch v2.0.0:
+  - [X] Feedback on current connection config (working proxy, blocked urls, direct connects)
 
 # How does it look?
 
@@ -73,27 +75,34 @@ proxy: http://192.168.0.27:8000
 or with specific url for checking (failing+avahi detection):
 ```
 dev@dev:~$ apt-proxy-detect.sh github.xyz
-Service[ER][apt-cacher-ng proxy on squid-deb-proxy]@http://192.168.0.27:3142 
-Service[ER][Squid deb proxy on squid-deb-proxy]@http://192.168.0.27:8000 
+[     BLOCKED][   -]: PROXY[http://192.168.0.68:8000] URL[github.xyz]
+[     BLOCKED][   -]: PROXY[http://192.168.0.68:3142] URL[github.xyz]
+[      DIRECT][   -]: URL[github.xyz]
 ```
 
 or within apt context:
 ```
 dev@dev:~$ sudo apt update
-Service[OK][Squid deb proxy on squid-deb-proxy]@http://192.168.0.27:8000 
-Service[ER][apt-cacher-ng proxy on squid-deb-proxy]@http://192.168.0.27:3142 
-Hit:1 http://local-repo.fritz.box/repo-repo trunk InRelease
-Hit:2 http://security.debian.org/debian-security bookworm-security InRelease              
-Hit:3 http://download.proxmox.com/debian/pve bookworm InRelease                           
-Hit:4 http://packages.microsoft.com/repos/code stable InRelease                           
-Hit:5 http://deb.debian.org/debian bookworm InRelease
-Get:6 http://deb.debian.org/debian bookworm-updates InRelease [52,1 kB]
-Hit:7 https://dl.google.com/linux/chrome/deb stable InRelease
-Fetched 52,1 kB in 3s (15,9 kB/s)
+[   VIA-PROXY][   -]: PROXY[http://192.168.0.68:8000] URL[https://packages.microsoft.com]
+[     BLOCKED][   -]: PROXY[http://192.168.0.68:3142] URL[https://packages.microsoft.com]
+[   VIA-PROXY][   -]: PROXY[http://192.168.0.68:8000] URL[http://download.proxmox.com]
+[     BLOCKED][   -]: PROXY[http://192.168.0.68:8000] URL[http://local-repo.fritz.box]
+[     BLOCKED][   -]: PROXY[http://192.168.0.68:3142] URL[http://local-repo.fritz.box]
+[      DIRECT][   -]: URL[http://local-repo.fritz.box]
+[   VIA-PROXY][   -]: PROXY[http://192.168.0.68:8000] URL[https://dl.google.com]
+[   VIA-PROXY][   -]: PROXY[http://192.168.0.68:8000] URL[http://security.debian.org]
+[   VIA-PROXY][   -]: PROXY[http://192.168.0.68:8000] URL[http://deb.debian.org]
+Hit:1 http://local-repo.fritz.box/local-repo trunk InRelease
+Hit:2 http://deb.debian.org/debian bookworm InRelease                                                                                                                           
+Hit:3 http://security.debian.org/debian-security bookworm-security InRelease                                                                                                    
+Hit:4 http://download.proxmox.com/debian/pve bookworm InRelease                                                                                                                 
+Hit:5 http://deb.debian.org/debian bookworm-updates InRelease                                                                                             
+Hit:6 https://packages.microsoft.com/repos/code stable InRelease                                                                    
+Hit:7 https://dl.google.com/linux/chrome/deb stable InRelease                                                 
 Reading package lists... Done
 Building dependency tree... Done
 Reading state information... Done
-22 packages can be upgraded. Run 'apt list --upgradable' to see them.
+All packages are up to date.
 ```
 
 # How to install?
