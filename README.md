@@ -21,7 +21,7 @@ it does not matter, it takes the working ones or none (direct connect), where ev
 apt-proxy-detect can be used as on clients to detect apt-cacher-ng or squid-deb-proxy in your network.
 
 # Why this is needed?
-Spending 2023/2024 time on this topic sound/reads quite strange but up to now
+Spending 2023 time on this topic sound/reads quite strange but up to now
 i struggle with some problems within the solutions i found so far.
 
 Issues:
@@ -102,14 +102,14 @@ Reading state information... Done
 
 So the quickest way is:
 ```
-curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/refs/heads/@branch@/install.deb.sh | sudo BRANCH=@branch@ bash
+curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/refs/heads/release/v1.0.0/install.deb.sh | sudo BRANCH=release/v1.0.0 bash
 ```
 
 looks like
 
 ```
-dev@dev~#> curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/refs/heads/@branch@/install.deb.sh | sudo BRANCH=@branch@ bash
-- BRANCH [@branch@]
+dev@dev~#> curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/refs/heads/release/v1.0.0/install.deb.sh | sudo BRANCH=release/v1.0.0 bash
+- BRANCH [release/v1.0.0]
 - downloading ... ok.
 dpkg-deb: building package 'apt-proxy-detect' in 'apt-proxy-detect_1.0.0_1730626377.deb'.
 Reading package lists... Done
