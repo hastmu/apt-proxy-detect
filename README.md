@@ -1,3 +1,7 @@
+![Static Badge](https://img.shields.io/badge/Overall--Status-Stable-green?style=flat) ![Static Badge](https://img.shields.io/badge/Target--Audience-Home|AVAHI--ENVs|General-green?style=flat)
+![Static Badge](https://img.shields.io/badge/BRANCHES-grey?style=flat)![Static Badge](https://img.shields.io/badge/DEV(main|unstable)-orange?style=flat)![Static Badge](https://img.shields.io/badge/Releases(release/*|stable)-green?style=flat)
+<hr>
+
 - [apt-proxy-detect](#apt-proxy-detect)
 - [Why this is needed?](#why-this-is-needed)
 - [How does it look?](#how-does-it-look)
@@ -7,6 +11,7 @@
 - [How does it work?](#how-does-it-work)
 - [Caching found proxies.](#caching-found-proxies)
 - [Debugging](#debugging)
+<hr>
 
 # apt-proxy-detect
 Auto detection of apt proxies in the LAN, caching and checking status of it.
