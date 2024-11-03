@@ -75,7 +75,9 @@ proxy: http://192.168.0.27:8000
 or with specific url for checking (failing+avahi detection):
 ```
 dev@dev:~$ apt-proxy-detect.sh github.xyz
+[       AVAHI][   -]: Announced proxy found PROXY[Squid deb proxy on squid-deb-proxy@http://192.168.0.68:8000]
 [     BLOCKED][   -]: PROXY[http://192.168.0.68:8000] URL[github.xyz]
+[       AVAHI][   -]: Announced proxy found PROXY[apt-cacher-ng proxy on squid-deb-proxy@http://192.168.0.68:3142]
 [     BLOCKED][   -]: PROXY[http://192.168.0.68:3142] URL[github.xyz]
 [      DIRECT][   -]: URL[github.xyz]
 ```
@@ -83,12 +85,42 @@ dev@dev:~$ apt-proxy-detect.sh github.xyz
 or within apt context:
 ```
 dev@dev:~$ sudo apt update
-[   VIA-PROXY][   -]: PROXY[http://192.168.0.68:8000] URL[https://packages.microsoft.com]
+[       AVAHI][   -]: Announced proxy found PROXY[Squid deb proxy on squid-deb-proxy@http://192.168.0.68:8000]
+[     BLOCKED][   -]: PROXY[http://192.168.0.68:8000] URL[https://packages.microsoft.com]
+[       AVAHI][   -]: Announced proxy found PROXY[apt-cacher-ng proxy on squid-deb-proxy@http://192.168.0.68:3142]
 [     BLOCKED][   -]: PROXY[http://192.168.0.68:3142] URL[https://packages.microsoft.com]
+[      DIRECT][   -]: URL[https://packages.microsoft.com]
+[     BLOCKED][   -]: PROXY[http://192.168.0.68:3142] URL[http://download.proxmox.com]
 [   VIA-PROXY][   -]: PROXY[http://192.168.0.68:8000] URL[http://download.proxmox.com]
-[     BLOCKED][   -]: PROXY[http://192.168.0.68:8000] URL[http://local-repo.fritz.box]
 [     BLOCKED][   -]: PROXY[http://192.168.0.68:3142] URL[http://local-repo.fritz.box]
+[     BLOCKED][   -]: PROXY[http://192.168.0.68:8000] URL[http://local-repo.fritz.box]
 [      DIRECT][   -]: URL[http://local-repo.fritz.box]
+[     BLOCKED][   -]: PROXY[http://192.168.0.68:3142] URL[https://dl.google.com]
+[   VIA-PROXY][   -]: PROXY[http://192.168.0.68:8000] URL[https://dl.google.com]
+[     BLOCKED][   -]: PROXY[http://192.168.0.68:3142] URL[http://security.debian.org]
+[   VIA-PROXY][   -]: PROXY[http://192.168.0.68:8000] URL[http://security.debian.org]
+[     BLOCKED][   -]: PROXY[http://192.168.0.68:3142] URL[http://deb.debian.org]
+[   VIA-PROXY][   -]: PROXY[http://192.168.0.68:8000] URL[http://deb.debian.org]
+Hit:1 http://local-repo.fritz.box/local-repo trunk InRelease
+Hit:2 http://deb.debian.org/debian bookworm InRelease                                                                                                                           
+Hit:3 http://security.debian.org/debian-security bookworm-security InRelease                                                                                                    
+Hit:4 http://download.proxmox.com/debian/pve bookworm InRelease                                                                                                                 
+Hit:5 http://deb.debian.org/debian bookworm-updates InRelease                                                                                             
+Hit:6 https://packages.microsoft.com/repos/code stable InRelease                                                                    
+Hit:7 https://dl.google.com/linux/chrome/deb stable InRelease                                                 
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+All packages are up to date.
+```
+
+second run (cached)
+
+```
+dev@dev:~$ sudo apt update
+[   VIA-PROXY][   -]: PROXY[http://192.168.0.68:8000] URL[https://packages.microsoft.com]
+[   VIA-PROXY][   -]: PROXY[http://192.168.0.68:8000] URL[http://download.proxmox.com]
+[      DIRECT][   -]: URL[http://linstones-repo.fritz.box]
 [   VIA-PROXY][   -]: PROXY[http://192.168.0.68:8000] URL[https://dl.google.com]
 [   VIA-PROXY][   -]: PROXY[http://192.168.0.68:8000] URL[http://security.debian.org]
 [   VIA-PROXY][   -]: PROXY[http://192.168.0.68:8000] URL[http://deb.debian.org]
@@ -104,6 +136,7 @@ Building dependency tree... Done
 Reading state information... Done
 All packages are up to date.
 ```
+
 
 # How to install?
 
