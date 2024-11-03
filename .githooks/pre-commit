@@ -11,11 +11,11 @@ set -e
 
    for item in "$(git diff --name-only --cached)"
    do
-      echo "item: ${item}" >&2
+      echo "item: ${item}" >> .pre-commit.state.log
       found=0
       if [[ ${item} =~ \.md$ ]] || [ "${item}" == "install.deb.sh" ]
       then
-         echo "CHANGED: ${item}" >&2
+         echo "CHANGED: ${item}" >> .pre-commit.state.log
          CHANGED["${item}"]="${item}.$(uuidgen)"
          cp -a "${item}" "${CHANGED["${item}"]}"
          cp -a "${item}" "${item}.template"
