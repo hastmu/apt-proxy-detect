@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # defaults
-echo "- BRANCH [${BRANCH:=release/v1.0.0}]"
+echo "- BRANCH [${BRANCH:=main}]"
 NAME="apt-proxy-detect"
 VERSION="1.0.0"
 HEADHASH="$(date +%s)"

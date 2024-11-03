@@ -102,14 +102,14 @@ Reading state information... Done
 
 So the quickest way is:
 ```
-curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/refs/heads/release/v1.0.0/install.deb.sh | sudo BRANCH=release/v1.0.0 bash
+curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/refs/heads/main/install.deb.sh | sudo BRANCH=main bash
 ```
 
 looks like
 
 ```
-dev@dev~#> curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/refs/heads/release/v1.0.0/install.deb.sh | sudo BRANCH=release/v1.0.0 bash
-- BRANCH [release/v1.0.0]
+dev@dev~#> curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/refs/heads/main/install.deb.sh | sudo BRANCH=main bash
+- BRANCH [main]
 - downloading ... ok.
 dpkg-deb: building package 'apt-proxy-detect' in 'apt-proxy-detect_1.0.0_1730626377.deb'.
 Reading package lists... Done
