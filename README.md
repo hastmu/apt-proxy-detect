@@ -12,7 +12,7 @@
 - [Debugging](#debugging)
 <hr>
 
-# apt-proxy-detect 
+# apt-proxy-detect
 Auto detection of apt proxies in the LAN, caching and checking status of it.
 
 In one sentence, set or let it find your proxies from work, school or from at home,
@@ -102,14 +102,14 @@ Reading state information... Done
 
 So the quickest way is:
 ```
-curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/refs/heads/@branch@/install.deb.sh | sudo bash
+curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/refs/heads/main/install.deb.sh | sudo bash
 ```
 
 looks like
 
 ```
-dev@dev~#> curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/refs/heads/@branch@/install.deb.sh | sudo bash
-- BRANCH [@branch@]
+dev@dev~#> curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/refs/heads/main/install.deb.sh | sudo bash
+- BRANCH [main]
 - downloading ... ok.
 dpkg-deb: building package 'apt-proxy-detect' in 'apt-proxy-detect_1.0.0_1705676551.deb'.
 Reading package lists... Done
@@ -138,7 +138,7 @@ dev@dev~#>
 
 if you like to specify a branch do it like:
 ```
-curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/refs/heads/@branch@/install.deb.sh | sudo BRANCH=@branch@ bash
+curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/refs/heads/main/install.deb.sh | sudo BRANCH=main bash
 ```
 
 # How does it work?
