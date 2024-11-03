@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# defaults
-echo "- BRANCH [${BRANCH:=@branch@}]"
+# defaults 
+echo "- BRANCH [${BRANCH:=feature/12-establish-pre-hook-for-md-updates}]"
 NAME="apt-proxy-detect"
 VERSION="1.0.0"
 HEADHASH="$(date +%s)"
