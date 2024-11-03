@@ -102,14 +102,14 @@ Reading state information... Done
 
 So the quickest way is:
 ```
-curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/refs/heads/feature/12-establish-pre-hook-for-md-updates/install.deb.sh | sudo bash
+curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/refs/heads/@branch@/install.deb.sh | sudo bash
 ```
 
 looks like
 
 ```
-dev@dev~#> curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/refs/heads/feature/12-establish-pre-hook-for-md-updates/install.deb.sh | sudo bash
-- BRANCH [feature/12-establish-pre-hook-for-md-updates]
+dev@dev~#> curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/refs/heads/@branch@/install.deb.sh | sudo bash
+- BRANCH [@branch@]
 - downloading ... ok.
 dpkg-deb: building package 'apt-proxy-detect' in 'apt-proxy-detect_1.0.0_1705676551.deb'.
 Reading package lists... Done
@@ -138,7 +138,7 @@ dev@dev~#>
 
 if you like to specify a branch do it like:
 ```
-curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/refs/heads/feature/12-establish-pre-hook-for-md-updates/install.deb.sh | sudo BRANCH=feature/12-establish-pre-hook-for-md-updates bash
+curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/refs/heads/@branch@/install.deb.sh | sudo BRANCH=@branch@ bash
 ```
 
 # How does it work?
