@@ -13,8 +13,6 @@
 - [Debugging](#debugging)
 <hr>
 
-hook keywords feature/12-establish-pre-hook-for-md-updates test test2 test4 test5
-
 # apt-proxy-detect
 Auto detection of apt proxies in the LAN, caching and checking status of it.
 
@@ -105,14 +103,14 @@ Reading state information... Done
 
 So the quickest way is:
 ```
-curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/main/install.deb.sh  | sudo bash
+curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/feature/12-establish-pre-hook-for-md-updates/install.deb.sh  | sudo bash
 ```
 
 looks like
 
 ```
-dev@dev~#> curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/main/install.deb.sh  | sudo bash
-- BRANCH [main]
+dev@dev~#> curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/feature/12-establish-pre-hook-for-md-updates/install.deb.sh  | sudo bash
+- BRANCH [feature/12-establish-pre-hook-for-md-updates]
 - downloading ... ok.
 dpkg-deb: building package 'apt-proxy-detect' in 'apt-proxy-detect_1.0.0_1705676551.deb'.
 Reading package lists... Done
@@ -141,7 +139,7 @@ dev@dev~#>
 
 if you like to specify a branch do it like:
 ```
-curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/main/install.deb.sh  | sudo BRANCH=main bash
+curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/feature/12-establish-pre-hook-for-md-updates/install.deb.sh  | sudo BRANCH=feature/12-establish-pre-hook-for-md-updates bash
 ```
 
 ## Old way 
@@ -152,15 +150,15 @@ sudo apt install -y coreutils grep sed wget avahi-utils
 
 So the quickest way is:
 ```
-curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/main/install.sh  | sudo bash
+curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/feature/12-establish-pre-hook-for-md-updates/install.sh  | sudo bash
 ```
 
 looks like:
 ```
-dev@dev:~$ curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/main/install.sh  | sudo bash
+dev@dev:~$ curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/feature/12-establish-pre-hook-for-md-updates/install.sh  | sudo bash
 - check dependencies...
 - download latest to: /usr/local/bin/apt-proxy-detect.sh
-- BRANCH [main]
+- BRANCH [feature/12-establish-pre-hook-for-md-updates]
 - set permissions to a+rx
 - create/updating /etc/apt/apt.conf.d/30apt-proxy-detect.conf
 
@@ -168,7 +166,7 @@ dev@dev:~$ curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/mai
 
 if you like to specify a branch do it like:
 ```
-curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/main/install.sh  | sudo BRANCH=main bash
+curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/feature/12-establish-pre-hook-for-md-updates/install.sh  | sudo BRANCH=feature/12-establish-pre-hook-for-md-updates bash
 ```
 
 or you just download the install.sh and run it locally.
