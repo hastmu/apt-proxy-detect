@@ -12,7 +12,7 @@
 - [Debugging](#debugging)
 <hr>
 
-@branch@
+@branch@ test
 
 # apt-proxy-detect
 Auto detection of apt proxies in the LAN, caching and checking status of it.
