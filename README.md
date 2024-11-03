@@ -13,7 +13,7 @@
 - [Debugging](#debugging)
 <hr>
 
-hook keywords @branch@ test
+hook keywords feature/12-establish-pre-hook-for-md-updates test test2
 
 # apt-proxy-detect
 Auto detection of apt proxies in the LAN, caching and checking status of it.
