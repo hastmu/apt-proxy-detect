@@ -1,0 +1,11 @@
+#!/bin/bash
+
+#set -e
+
+   source ".pre-commit.state"
+
+   for item in "${!CHANGED[@]}"
+   do
+      mv "${CHANGED["${item}"]}" "${item}"
+   done
+
