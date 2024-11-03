@@ -45,7 +45,7 @@ EOF
     mkdir -p "${T_DIR}$(dirname "${APT_CONFIG_NAME}")"
     # shellcheck disable=SC2027
     echo "Acquire::http::ProxyAutoDetect \""${TARGET}"\";" > "${T_DIR}${APT_CONFIG_NAME}"
-    echo "Acquire::https::ProxyAutoDetect \""${TARGET}"\";" > "${T_DIR}${APT_CONFIG_NAME}"
+    echo "Acquire::https::ProxyAutoDetect \""${TARGET}"\";" >> "${T_DIR}${APT_CONFIG_NAME}"
 
 )
 
