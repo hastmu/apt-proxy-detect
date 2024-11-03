@@ -7,7 +7,6 @@
 - [How does it look?](#how-does-it-look)
 - [How to install?](#how-to-install)
   - [Via deb-build and deb installation.](#via-deb-build-and-deb-installation)
-  - [Old way](#old-way)
 - [How does it work?](#how-does-it-work)
 - [Caching found proxies.](#caching-found-proxies)
 - [Debugging](#debugging)
@@ -103,73 +102,41 @@ Reading state information... Done
 
 So the quickest way is:
 ```
-curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/main/install.deb.sh  | sudo bash
+curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/refs/heads/release/v1.0.0/install.deb.sh | sudo BRANCH=release/v1.0.0 bash
 ```
 
 looks like
 
 ```
-dev@dev~#> curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/main/install.deb.sh  | sudo bash
-- BRANCH [main]
+dev@dev~#> curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/refs/heads/release/v1.0.0/install.deb.sh | sudo BRANCH=release/v1.0.0 bash
+- BRANCH [release/v1.0.0]
 - downloading ... ok.
-dpkg-deb: building package 'apt-proxy-detect' in 'apt-proxy-detect_1.0.0_1705676551.deb'.
+dpkg-deb: building package 'apt-proxy-detect' in 'apt-proxy-detect_1.0.0_1730626377.deb'.
 Reading package lists... Done
 Building dependency tree... Done
 Reading state information... Done
-Note, selecting 'apt-proxy-detect' instead of '/home/dev/apt-proxy-detect_1.0.0_1705676551.deb'
+Note, selecting 'apt-proxy-detect' instead of '/root/apt-proxy-detect_1.0.0_1730626377.deb'
 The following packages will be upgraded:
   apt-proxy-detect
-1 upgraded, 0 newly installed, 0 to remove and 11 not upgraded.
-Need to get 0 B/3.500 B of archives.
+1 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.
+Need to get 0 B/3604 B of archives.
 After this operation, 0 B of additional disk space will be used.
-Get:1 /home/dev/apt-proxy-detect_1.0.0_1705676551.deb apt-proxy-detect all 1.0.0-main-1705676551 [3.500 B]
+Get:1 /root/apt-proxy-detect_1.0.0_1730626377.deb apt-proxy-detect all 1.0.0-release-v1.0.0-1730626377 [3604 B]
 apt-listchanges: Reading changelogs...
-(Reading database ... 393385 files and directories currently installed.)
-Preparing to unpack .../apt-proxy-detect_1.0.0_1705676551.deb ...
-Unpacking apt-proxy-detect (1.0.0-main-1705676551) over (1.0.0-main-1705676340) ...
-Setting up apt-proxy-detect (1.0.0-main-1705676551) ...
+(Reading database ... 22366 files and directories currently installed.)
+Preparing to unpack .../apt-proxy-detect_1.0.0_1730626377.deb ...
+Unpacking apt-proxy-detect (1.0.0-release-v1.0.0-1730626377) over (1.0.0-main-1729256401) ...
+Setting up apt-proxy-detect (1.0.0-release-v1.0.0-1730626377) ...
+N: Download is performed unsandboxed as root as file '/root/apt-proxy-detect_1.0.0_1730626377.deb' couldn't be accessed by user '_apt'. - pkgAcquire::Run (13: Permission denied)
+removed '/root/apt-proxy-detect_1.0.0_1730626377.deb'
 Desired=Unknown/Install/Remove/Purge/Hold
 | Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
 |/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
-||/ Name             Version               Architecture Description
-+++-================-=====================-============-=================================
-ii  apt-proxy-detect 1.0.0-main-1705676551 all          apt proxy detection
+||/ Name             Version                         Architecture Description
++++-================-===============================-============-=================================
+ii  apt-proxy-detect 1.0.0-release-v1.0.0-1730626377 all          apt proxy detection
 dev@dev~#> 
 ```
-
-if you like to specify a branch do it like:
-```
-curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/main/install.deb.sh  | sudo BRANCH=main bash
-```
-
-## Old way 
-Required packages can be installed via:
-```
-sudo apt install -y coreutils grep sed wget avahi-utils
-```
-
-So the quickest way is:
-```
-curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/main/install.sh  | sudo bash
-```
-
-looks like:
-```
-dev@dev:~$ curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/main/install.sh  | sudo bash
-- check dependencies...
-- download latest to: /usr/local/bin/apt-proxy-detect.sh
-- BRANCH [main]
-- set permissions to a+rx
-- create/updating /etc/apt/apt.conf.d/30apt-proxy-detect.conf
-
-```
-
-if you like to specify a branch do it like:
-```
-curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/main/install.sh  | sudo BRANCH=main bash
-```
-
-or you just download the install.sh and run it locally.
 
 # How does it work?
 
