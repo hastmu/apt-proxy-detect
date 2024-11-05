@@ -54,6 +54,8 @@ echo "- deploying..."
          then
             echo "- sourcing build..."
             source ".include.build.deb.sh"
+            gen_control_file
+            gen_rootfs
             find "${DPKG_BUILD_ROOT}"
          fi
       )
