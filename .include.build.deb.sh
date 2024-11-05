@@ -2,7 +2,7 @@
 declare -A DEBIAN
 
 DEBIAN["Package"]="apt-proxy-detect"
-DEBIAN["Version"]="${branch_type}-${branch_tag}-${branch}"
+DEBIAN["Version"]="${branch_type}-${branch_tag}-${branch_name}"
 DEBIAN["Section"]="base"
 DEBIAN["Priority"]="optional"
 DEBIAN["Architecture"]="all"
