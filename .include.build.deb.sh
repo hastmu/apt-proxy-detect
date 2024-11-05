@@ -26,8 +26,8 @@ function gen_control_file() {
 function gen_rootfs() {
 
    # create dirs
-   mkdir "${DPKG_BUILD_ROOT}/usr/local/bin"
-   mkdir "${DPKG_BUILD_ROOT}/etc/apt/apt.conf.d"
+   mkdir -p "${DPKG_BUILD_ROOT}/usr/local/bin"
+   mkdir -p "${DPKG_BUILD_ROOT}/etc/apt/apt.conf.d"
 
    # copy files
    cp -av apt-proxy-detect.sh "${DPKG_BUILD_ROOT}/usr/local/bin/."
