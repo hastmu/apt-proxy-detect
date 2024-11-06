@@ -158,7 +158,7 @@ function check_proxy() {
          fi
          return 0
       fi
-   elif [ ! -z "${check_proxy_cache[$1.$2]}" ]
+   elif [ -n "${check_proxy_cache[$1.$2]}" ]
    then
       return ${check_proxy_cache[$1.$2]}
    else
@@ -347,10 +347,7 @@ then
    CACHED_PROXIES[${testurl_hash}]="${ret}"
    CACHED_PROXIES_AGE[${testurl_hash}]="${now}"
    debug "CACHE" "Update cachefile."
-   declare -p CACHED_PROXIES > "${cache_file}"
-   declare -p CACHED_PROXIES_AGE >> "${cache_file}"
-   declare -p WORKING_PROXIES >> "${cache_file}"
-   declare -p AVAHI_PROXIES >> "${cache_file}"
+   { declare -p CACHED_PROXIES ; declare -p CACHED_PROXIES_AGE ; declare -p WORKING_PROXIES ; declare -p AVAHI_PROXIES ; } > "${cache_file}"
 fi
 
 exit 0

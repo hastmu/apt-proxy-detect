@@ -3,6 +3,7 @@
 declare -A DEBIAN
 
 DEBIAN["Package"]="apt-proxy-detect"
+# shellcheck disable=SC2154
 DEBIAN["Version"]="${branch_version}-${branch_name}-${branch_tag}"
 DEBIAN["Section"]="base"
 DEBIAN["Priority"]="optional"
