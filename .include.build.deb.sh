@@ -1,3 +1,4 @@
+#!/bin/bash
 
 declare -A DEBIAN
 
@@ -16,7 +17,7 @@ function gen_control_file() {
    local item=""
    mkdir -p "${DPKG_BUILD_ROOT}/DEBIAN"
    touch "${DPKG_BUILD_ROOT}/DEBIAN/control"
-   for item in ${!DEBIAN[@]}
+   for item in "${!DEBIAN[@]}"
    do
       echo "${item}: ${DEBIAN[${item}]}" >> "${DPKG_BUILD_ROOT}/DEBIAN/control"
    done
@@ -33,7 +34,9 @@ function gen_rootfs() {
    cp -av apt-proxy-detect.sh "${DPKG_BUILD_ROOT}/usr/local/bin/."
 
    # create files
+   # shellcheck disable=SC2140
    echo "Acquire::http::ProxyAutoDetect \""/usr/local/bin/apt-proxy-detect.sh"\";" > "${DPKG_BUILD_ROOT}/etc/apt/apt.conf.d/30apt-proxy-detect.conf"
+   # shellcheck disable=SC2140
    echo "Acquire::https::ProxyAutoDetect \""/usr/local/bin/apt-proxy-detect.sh"\";" >> "${DPKG_BUILD_ROOT}/etc/apt/apt.conf.d/30apt-proxy-detect.conf"
 
    # set permissions
