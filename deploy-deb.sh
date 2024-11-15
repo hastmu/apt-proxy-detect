@@ -47,8 +47,8 @@ source .include.common.sh
       branch_tag=${tag_hash[${branch_hash}]:="none"}
       if [ "${branch_tag}" == "none" ]
       then
-         branch_version="0.0.0"
-         branch_tag="${branch_hash:0:7}-$(date +%s)"
+         branch_version="0.0.1"
+         branch_tag="$(date +%s)"
       else
          branch_version="${branch_tag//v/}"
       fi
@@ -66,7 +66,8 @@ source .include.common.sh
             gen_control_file
             gen_rootfs
             find "${DPKG_BUILD_ROOT}"
-            deb_name="${DEBIAN["Package"]}-${DEBIAN["Version"]}_${DEBIAN["Architecture"]}.deb"
+            #deb_name="${DEBIAN["Package"]}-${DEBIAN["Version"]}_${DEBIAN["Architecture"]}.deb"
+            deb_name="${DEBIAN["Package"]}-${branch_version}-${branch_name}-${branch_hash:0:7}-${branch_tag}_${DEBIAN["Architecture"]}.deb"
             if dpkg -b "${DPKG_BUILD_ROOT}" "${T_DIR}/.dpkg-root/${deb_name}"
             then
                ls -al "${T_DIR}/.dpkg-root/${deb_name}"
