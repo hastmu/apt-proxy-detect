@@ -9,7 +9,7 @@ DEBIAN["Section"]="base"
 DEBIAN["Priority"]="optional"
 DEBIAN["Architecture"]="all"
 DEBIAN["Depends"]="coreutils, grep, sed, wget, avahi-utils"
-DEBIAN["Conflict"]="squid-deb-proxy-client"
+DEBIAN["Conflict"]="squid-deb-proxy-client, auto-apt-proxy"
 DEBIAN["Maintainer"]="nomail@nomail.no"
 DEBIAN["Description"]="apt proxy detection"
 
