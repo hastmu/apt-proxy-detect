@@ -33,8 +33,8 @@ Issues:
 What do you get?
 - [X] branch v1.0.0 (released)
   - [X] Proxy detection via
-      - avahi
-      - set defaults
+    - [X] avahi
+    - [X] set defaults
   - [X] caching of URL specific working proxy (or none if none works)
   - [X] caching over reboot if possible
   - [X] allow mixture of allowed and non allowed urls (no need for direct declaration)
@@ -145,14 +145,14 @@ All packages are up to date.
 
 So the quickest way is:
 ```
-curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/refs/heads/@branch@/install.deb.sh | sudo BRANCH=@branch@ bash
+curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/refs/heads/main/install.deb.sh | sudo BRANCH=main bash
 ```
 
 looks like
 
 ```
-dev@dev~#> curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/refs/heads/@branch@/install.deb.sh | sudo BRANCH=@branch@ bash
-- BRANCH [@branch@]
+dev@dev~#> curl -s https://raw.githubusercontent.com/hastmu/apt-proxy-detect/refs/heads/main/install.deb.sh | sudo BRANCH=main bash
+- BRANCH [main]
 - downloading ... ok.
 dpkg-deb: building package 'apt-proxy-detect' in 'apt-proxy-detect_1.0.0_1730626377.deb'.
 Reading package lists... Done

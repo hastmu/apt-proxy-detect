@@ -33,8 +33,8 @@ Issues:
 What do you get?
 - [X] branch v1.0.0 (released)
   - [X] Proxy detection via
-      - avahi
-      - set defaults
+    - [X] avahi
+    - [X] set defaults
   - [X] caching of URL specific working proxy (or none if none works)
   - [X] caching over reboot if possible
   - [X] allow mixture of allowed and non allowed urls (no need for direct declaration)

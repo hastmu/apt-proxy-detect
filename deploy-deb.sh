@@ -1,10 +1,11 @@
 #!/bin/bash
 
 echo "- deploying..."
+# shellcheck disable=SC1091
 source .include.common.sh
 
 (
-   cd "$(dirname "$0")"
+   cd "$(dirname "$0")" || exit
    pwd
 #   git branch -r -v
    GIT_CLONE_URL=$(git ls-remote --get-url origin)
