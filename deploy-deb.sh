@@ -13,14 +13,14 @@ source .include.common.sh
    declare -A tag_hash
    for tag in $(git tag)
    do
-      tag_hash[$(git rev-list -n 1 ${tag})]="${tag}"
+      tag_hash[$(git rev-list -n 1 "${tag}")]="${tag}"
    done
    declare -p tag_hash
 
    T_DIR=$(mktemp -d)
    trap 'rm -Rf ${T_DIR}' EXIT
    mkdir "${T_DIR}/.dpkg-root"
-   ( cd ${T_DIR} ; git clone ${GIT_CLONE_URL} )
+   ( cd "${T_DIR}" || exit ; git clone "${GIT_CLONE_URL}" )
 
 
    for branch in $(git branch -r | awk '{ print $1 }')
@@ -58,6 +58,8 @@ source .include.common.sh
       mkdir -p "${DPKG_BUILD_ROOT}"
 
       ( 
+         # shellcheck disable=SC2164
+         # shellcheck disable=SC2086
          cd ${T_DIR}/* ; git checkout "${branch_hash}"
          if [ -r ".include.build.deb.sh" ]   
          then
