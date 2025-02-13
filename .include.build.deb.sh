@@ -46,20 +46,3 @@ function gen_rootfs() {
 
 }
 
-
-
-
-if [ 1 -eq 0 ]
-then
-   # defaults
-
-   DPKG_NAME="${NAME}_${VERSION}_${BRANCH//\//-}_${HEADHASH}.deb"
-   if dpkg -b "${T_DIR}" "${DPKG_NAME}"
-   then
-      apt-cache show "$(pwd)/${DPKG_NAME}"
-      apt-get install --allow-downgrades -y "$(pwd)/${DPKG_NAME}"
-      rm -fv "$(pwd)/${DPKG_NAME}"
-      dpkg -l "${NAME}"
-   fi
-
-fi
