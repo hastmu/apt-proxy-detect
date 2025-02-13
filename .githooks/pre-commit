@@ -17,8 +17,8 @@ set -e
       then
          echo "CHANGED: ${item}" >> .pre-commit.state.log
          CHANGED["${item}"]="${item}.$(uuidgen)"
-         cp -a "${item}" "${CHANGED["${item}"]}"
-         cp -a "${item}" "${item}.template"
+         cp  "${item}" "${CHANGED["${item}"]}"
+         cp  "${item}" "${item}.template"
          git add "${item}.template"
          # change file as needed
          sed -i "s:@branch@:${BRANCH}:g" "${item}"
