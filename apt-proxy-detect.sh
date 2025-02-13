@@ -160,7 +160,7 @@ function check_proxy() {
       fi
    elif [ -n "${check_proxy_cache[$1.$2]}" ]
    then
-      return ${check_proxy_cache[$1.$2]}
+      return "${check_proxy_cache[$1.$2]}"
    else
       if [ $debug -gt 1 ]
       then
