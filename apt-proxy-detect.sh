@@ -16,6 +16,9 @@
 # v6 ... add default proxies
 # v7 ... check ownership of files with test -O
 #        + updated some debug statements
+# v8 ... fixed multi protocol avahi annoucement, e.g. ipv4 + ipv6
+#        + fixed an unneeded search if a working proxy was already found
+#        + improve code
 
 
 
@@ -102,7 +105,7 @@ declare -A CACHED_PROXIES_AGE
 declare -A AVAHI_PROXIES
 
 declare -i debug
-[ -z "${DEBUG_APT_PROXY_DETECT}" ] && debug=0 || debug=1
+debug=${DEBUG_APT_PROXY_DETECT:=0}
 
 declare -i start_time=0
 start_time=$(date +%s%N)
@@ -162,7 +165,7 @@ function check_proxy() {
    then
       return "${check_proxy_cache[$1.$2]}"
    else
-      if [ $debug -gt 1 ]
+      if [ $debug -ne 0 ]
       then
          wget -v --tries=1 -T 1 --header="Range: bytes=0-10" -e "http_proxy=$1" -e "https_proxy=$1" -O - "$2" >&2
       else
@@ -277,20 +280,24 @@ do
    fi
 done
 
-# check found AVAHI_PROXIES
-for proxy in "${!AVAHI_PROXIES[@]}"
-do
-   debug "CHECK" "avahi proxy: ${proxy} for ${testurl}"
-   if check_proxy "${proxy}" "${testurl}"
-   then
-      ret="${proxy}"
-   fi
-done
+if [ -z "${ret}" ]
+then
+   # check found AVAHI_PROXIES
+   for proxy in "${!AVAHI_PROXIES[@]}"
+   do
+      debug "CHECK" "avahi proxy: ${proxy} for ${testurl}"
+      if check_proxy "${proxy}" "${testurl}"
+      then
+         ret="${proxy}"
+      fi
+   done
+fi
 
 # search for proxies if none was found so far.
 if [ -z "${ret}" ]
 then
    T_FILE=$(mktemp)
+   declare -A AVAHI_PROXIES=()
    trap 'rm -f ${T_FILE}' EXIT
    debug "AVAHI" "get cache entries for ${service_name}"
    avahi-browse -tcpr ${service_name} > "${T_FILE}"
@@ -306,28 +313,39 @@ then
    do
       name="$(echo "${service}" | cut -d\; -f4 | sed 's:\\032: :g')"
       namef="$(echo "${service}" | cut -d\; -f4)"
-      proxy="http://$(grep "^=" "${T_FILE}" | grep "${namef//\\/\\\\}" | cut -d\; -f8,9 | tr ";" ":")"
-      debug "CHECK" "Checking found proxy (${proxy}) with testurl (${testurl})"
-      if [ -z "${AVAHI_PROXIES["${proxy}"]}" ]
-      then
-         # show only new once
-         info "AVAHI" "Announced proxy found PROXY[${name}@${proxy}]"
-      fi
-      if check_proxy "${proxy}" "${testurl}"
-      then
-         # ok 
-         if [ -z "${ret}" ]
-         then
-            ret="${proxy}"
+      for proxyf in $(grep "^=" "${T_FILE}" | grep "${namef//\\/\\\\}" | cut -d\; -f8,9)
+      do
+         # 123.456.789.abc;12345 = 12 + 6 = 18 ipv4
+         if [ ${#proxyf} -gt 18 ]
+         then 
+            # ipv6
+            proxy="http://[$(echo ${proxyf} | cut -d\; -f1)]:$(echo ${proxyf} | cut -d\; -f2)"
+         else
+            # ipv4
+            proxy="http://${proxyf//;/:}"
          fi
-         debug "PROXY-IS-OK" "add proxy to working proxy list."
-         WORKING_PROXIES["${proxy}"]="${now}"
-         AVAHI_PROXIES["${proxy}"]="${now}"
-         break
-      else
-         debug "PROXY-IS-BAD" "add proxy to avahi proxy list."
-         AVAHI_PROXIES["${proxy}"]="${now}"
-      fi
+         debug "CHECK" "Checking found proxy (${proxy}) with testurl (${testurl})"
+         if [ -z "${AVAHI_PROXIES["${proxy}"]}" ]
+         then
+            # show only new once
+            info "AVAHI" "Announced proxy found PROXY[${name}@${proxy}]"
+         fi
+         if check_proxy "${proxy}" "${testurl}"
+         then
+            # ok 
+            if [ -z "${ret}" ]
+            then
+               ret="${proxy}"
+            fi
+            debug "PROXY-IS-OK" "add proxy to working proxy list."
+            WORKING_PROXIES["${proxy}"]="${now}"
+            AVAHI_PROXIES["${proxy}"]="${now}"
+            break
+         else
+            debug "PROXY-IS-BAD" "add proxy to avahi proxy list."
+            AVAHI_PROXIES["${proxy}"]="${now}"
+         fi
+      done
    done
 fi
 debug "PROXY" "return :${ret}:"
