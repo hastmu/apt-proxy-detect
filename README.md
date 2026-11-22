@@ -215,6 +215,12 @@ export DEBUG_APT_PROXY_DETECT=1
 sudo apt update
 ```
 
+perhaps one need to set 
+
+```
+sudo -E apt update
+```
+
 looks like (first run, with comments)
 
 ```
